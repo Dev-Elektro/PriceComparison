@@ -3,21 +3,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
+from . import verified, verifiedSpec
 
-def verified(txt, query):
-    v = 0
-    for i in query.split(" "):
-        if i.lower() in txt.lower():
-            v += 1
-    if len(query.split(" ")) - v != 0:
-        return False
-    return True
-
-def parseProductCard(driver, url):
+def parseProductCard(browser, url):
     try:
-        driver.get(f"{url}properties/")
-        WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'SpecificationsFull')))
-        contentHtml = driver.find_element(By.ID, 'content').get_attribute('innerHTML')
+        browser.get(f"{url}properties/")
+        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'SpecificationsFull')))
+        contentHtml = browser.find_element(By.ID, 'content').get_attribute('innerHTML')
         contentHtml = BeautifulSoup(contentHtml, 'lxml')
         productName = contentHtml.find('h1', {'class': 'ProductHeader__title'}).get_text(strip = True)
         productPrice = contentHtml.find('span', {'class': 'ProductHeader__price-default_current-price'}).get_text(strip = True).replace(' ', '')
@@ -41,15 +33,16 @@ def parseProductCard(driver, url):
     return res
 
 def search(driver, query):
-    driver.get(f"https://www.citilink.ru/search/?text={query}&sorting=price_asc")
-    currentUrl = driver.current_url
+    browser = driver.getBrowser()
+    browser.get(f"https://www.citilink.ru/search/?text={query}&sorting=price_asc")
+    currentUrl = browser.current_url
     if 'search' in currentUrl:
         try:
-            WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
+            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
         except Exception as e:
             return None
 
-        grid = driver.find_element(By.CLASS_NAME, 'ProductCardCategoryList__grid')
+        grid = browser.find_element(By.CLASS_NAME, 'ProductCardCategoryList__grid')
         soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
         elements = soup.find_all('div', {'class': 'ProductCardVertical'})
         for element in elements:
@@ -60,11 +53,10 @@ def search(driver, query):
             except Exception as e:
                 continue
             if not verified(productName, query):
-                res = parseProductCard(driver, link)
+                res = parseProductCard(browser, link)
                 if not res:
                     continue
-                buf = f"{' '.join(map(lambda x: str(x.get('value')), res.get('specifications')))} {res.get('name')}"
-                if not verified(buf, query):
+                if not verifiedSpec(res.get('name'), res.get('specifications'), query):
                     continue
             yield {
                 'name': productName,
@@ -72,10 +64,9 @@ def search(driver, query):
                 'url': f'{link}'
             }
     elif 'product' in currentUrl:
-        res = parseProductCard(driver, currentUrl)
+        res = parseProductCard(browser, currentUrl)
         if res:
-            buf = f"{' '.join(map(lambda x: str(x.get('value')), res.get('specifications')))} {res.get('name')}"
-            if verified(buf, query):
+            if verifiedSpec(res.get('name'), res.get('specifications'), query):
                 yield {
                     'name': res.get('name'),
                     'price': res.get('price'),
