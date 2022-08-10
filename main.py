@@ -127,7 +127,7 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
             null="Ничего не считано, необходимо проверить входные данные"
             return null
 
-
+      #test
       #print(check)
       #print(list_result)
 
