@@ -72,10 +72,8 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
                                 print(letter0, coordinate_now)
                                 #list_result.extend([[cell.value,coordinate0]])
                                 #print(list_result)
-
                                 #result_search=search(cell.value)
                                 buf = function_search.search(driver, cell.value)
-                                #print("\nCitilink:\n")
                                 citilink_result=""
                                 for i in buf:
                                     print(f"{i.get('name')} - Цена: {i.get('price')}\n")
@@ -87,7 +85,6 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
                                     write2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
                                     coordinate_now=int(coordinate_now)+1
                                     write_file_index(str(coordinate_now))
-
                                 else:
                                     print("Ищем по резервному названию")
                                     yacheika=str(reserv_column)+str(cell.row)
@@ -95,7 +92,6 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
                                     print (yacheika)
                                     print(planB.value)
                                     buf = function_search.search(driver, planB.value)
-                                    #print("\nCitilink:\n")
                                     citilink_result=""
 
                                     for i in buf:
@@ -114,24 +110,10 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
                                         coordinate_now=int(coordinate_now)+1
                                         write_file_index(str(coordinate_now))
 
-
-
       write_file_index("") #очищаем файл с индексом
       write_file_index_nach("") #очищаем файл с начальным индексом
       print(f"Выполнен поиск по магазину {function_search}")
-      if list_result:
-
-            return list_result
-      else:
-            null="Ничего не считано, необходимо проверить входные данные"
-            return null
-
-      #test
-      #print(check)
-      #print(list_result)
-
-
-
+      
 
 
 #(путь к файлу, имя листа, буква основной колонки, имя столбца основного, данные для записи, номер ячейки)
@@ -166,7 +148,6 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2)
                  megre_cell.font = Font(name='Times New Roman', size=11)
                  rd = ws.row_dimensions[int(nomer2)] # get dimension for row
                  rd.height=70
-
             else:
                   megre_cell =ws[yacheyka]
                   ws[yacheyka]=list_zapis
