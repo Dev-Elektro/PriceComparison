@@ -4,11 +4,6 @@ from time import sleep
 from tkinter.messagebox import YESNOCANCEL
 from searchSite import Driver, citilink, regard, dnsshop, ozon
 
-from selenium import webdriver
-from selenium_stealth import stealth
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-
 from cgitb import text
 from tkinter import filedialog
 from tkinter import *
@@ -208,4 +203,5 @@ for i in buf:
 """
 driver.stop()
 input("\nНажми Enter для завершения...")
+
 quit()
