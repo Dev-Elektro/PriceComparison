@@ -39,6 +39,16 @@ class App(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.progressBar.setValue(0)
         self.progressBar.show()
 
+    def closeEvent(self, event):
+        try:
+            self.request.stop()
+            self.hide()
+            self.thread.quit()
+            self.thread.wait(30000)
+        except AttributeError:
+            pass
+        event.accept()
+
     def stopSearch(self):
         self.request.stop()
         self.butSearch.setText('Остановка')
