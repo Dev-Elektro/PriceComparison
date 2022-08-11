@@ -57,11 +57,14 @@ def search(driver, query):
                 link = f"https://www.citilink.ru{element.find('a', {'class': 'ProductCardVertical__name'}).get('href')}"
             except Exception as e:
                 continue
-            if not verified(productName, query):
+            ver = verified(productName, query)
+            if ver == 0:
+                continue
+            elif ver < 100:
                 res = parseProductCard(browser, link)
                 if not res:
                     continue
-                if not verifiedSpec(res.get('name'), res.get('specifications'), query):
+                if verifiedSpec(res.get('name'), res.get('specifications'), query) == 0:
                     continue
             yield {
                 'name': productName,
@@ -71,7 +74,7 @@ def search(driver, query):
     elif 'product' in currentUrl:
         res = parseProductCard(browser, currentUrl)
         if res:
-            if verifiedSpec(res.get('name'), res.get('specifications'), query):
+            if verifiedSpec(res.get('name'), res.get('specifications'), query) == 100:
                 yield {
                     'name': res.get('name'),
                     'price': res.get('price'),

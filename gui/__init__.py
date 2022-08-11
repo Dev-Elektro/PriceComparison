@@ -14,6 +14,7 @@ class App(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.setWindowTitle(f'Сравнение цен')
         self.butSearch.clicked.connect(self.startSearch)
         self.progressBar.hide()
+        self.textBrowser.setOpenExternalLinks(True)
 
     def startSearch(self):
         if len(self.lineSearch.text()) < 3:
@@ -75,7 +76,7 @@ class App(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         if not res:
             self.textBrowser.insertHtml(f"Нет результата.<br><br>")
             return
-        self.textBrowser.insertHtml(f"<a href='{res.get('link')}'>{res.get('name')} - Цена: {res.get('price')}</a><br>")
+        self.textBrowser.insertHtml(f"<a href='{res.get('url')}'>{res.get('name')} - Цена: {res.get('price')}</a><br>")
 
 def startGUI():
     app = QtWidgets.QApplication(sys.argv)

@@ -32,46 +32,46 @@ class requestsearch(QtCore.QObject):
         if self.stoped: return self._stopSearch()
         buf = citilink.search(self.driver, self.request)
         self.startSearch.emit("citilink.ru")
-        try:
-            self.found.emit(next(buf))
-        except Exception as e:
-            self.found.emit(None)
-        # f = False
-        # for res in buf:
-        #     if self.stoped: return self._stopSearch()
-        #     f = True
-        #     self.found.emit(res)
-        # if not f:
+        # try:
+        #     self.found.emit(next(buf))
+        # except Exception as e:
         #     self.found.emit(None)
+        f = False
+        for res in buf:
+            if self.stoped: return self._stopSearch()
+            f = True
+            self.found.emit(res)
+        if not f:
+            self.found.emit(None)
 
         if self.stoped: return self._stopSearch()
         buf = regard.search(self.driver, self.request)
         self.startSearch.emit('regard.ru')
-        try:
-            self.found.emit(next(buf))
-        except Exception as e:
-            self.found.emit(None)
-        # f = False
-        # for res in buf:
-        #     if self.stoped: return self._stopSearch()
-        #     f = True
-        #     self.found.emit(res)
-        # if not f:
+        # try:
+        #     self.found.emit(next(buf))
+        # except Exception as e:
         #     self.found.emit(None)
+        f = False
+        for res in buf:
+            if self.stoped: return self._stopSearch()
+            f = True
+            self.found.emit(res)
+        if not f:
+            self.found.emit(None)
 
         if self.stoped: return self._stopSearch()
         buf = dnsshop.search(self.driver, self.request)
         self.startSearch.emit('dns-shop.ru')
-        try:
-            self.found.emit(next(buf))
-        except Exception as e:
-            self.found.emit(None)
-        # f = False
-        # for res in buf:
-        #     if self.stoped: return self._stopSearch()
-        #     f = True
-        #     self.found.emit(res)
-        # if not f:
+        # try:
+        #     self.found.emit(next(buf))
+        # except Exception as e:
         #     self.found.emit(None)
+        f = False
+        for res in buf:
+            if self.stoped: return self._stopSearch()
+            f = True
+            self.found.emit(res)
+        if not f:
+            self.found.emit(None)
         self.driver.stop()
         self.finished.emit(True)

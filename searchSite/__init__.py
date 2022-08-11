@@ -41,7 +41,7 @@ def verified(txt, query):
     """Пословестный поиск совподений в строке."""
     queryItems = query.split(" ") # Разбивка поискового запроса на слова.
     # Возврат True если все слова поискового запроса нашлись в тексте.
-    return not len(queryItems) - sum(True for i in queryItems if i.lower() in txt.lower())
+    return sum(True for i in queryItems if i.lower() in txt.lower()) * 100 / len(queryItems)
 
 def verifiedSpec(name, spec, query):
     """Пословестный поиск совпадений в характеристиках."""
