@@ -1,8 +1,16 @@
 document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display:none")
-
+document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-3").style=("display:none");
+document.querySelector(".u-text.u-text-palette-1-light-1.u-text-3").style=("display:none");
 document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-1").style=("display:none")
-document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-4").style=("display:none")
 document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-2").style=("display:none")
+document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-5").style=("display:none")
+
+
+
+
+
+
+
 
 
 // Onclick of the button
@@ -28,23 +36,45 @@ document.querySelector("#choosefile").onclick = function () {
 }
 
 
+//открыть файл
+document.querySelector("#openresultfile").onclick = function () {  
+   // Call python's random_python function
+  
+  
+    // Update the div with a random number returned by python
+    
+    if (document.querySelector("#outfilename").innerHTML)
+    {
+      eel.resultfileopen();
+    }
+    else
+    {alert( "Нет файла реестра... ошибка, откройте вручную" );}
+  
+}
+
+
+
 
 
 
 eel.expose(js_wait);
 function js_wait() {
   document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-2").style=("display:none");
+  document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-3").style=("display:none");
+  document.querySelector(".u-text.u-text-palette-1-light-1.u-text-3").style=("display");
   document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-1").style=("display");
-  document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-4").style=("display");
-  document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-4").innerHTML="Выполняем работы, пожалуйста, подождите...";
+  document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-5").style=("display");
+  document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-5").innerHTML="Выполняем работы, пожалуйста, подождите...";
 }
 
 
 eel.expose(js_gotovo);
 function js_gotovo() {
   document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-1").style=("display:none");
+  document.querySelector(".u-text.u-text-palette-1-light-1.u-text-3").style=("display:none");
   document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-2").style=("display");
-  document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-4").innerHTML="Работы завершены!";
+  document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-5").innerHTML="Работы завершены!";
+  document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-3").style=("display");
 }
 
 
@@ -59,9 +89,10 @@ function my_javascript_function(out) {
 
 document.querySelector("#startsearch").onclick = async function () {
 
- 
-  eel.start_search_js()
+  document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display:none");
+  eel.start_search_js();
   
+ 
   
   
 }

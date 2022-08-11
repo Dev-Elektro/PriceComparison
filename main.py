@@ -186,6 +186,7 @@ def fileopen():
       root = Tk()
       root.attributes('-toolwindow', True)
       root.eval('tk::PlaceWindow . center')
+      root.withdraw()
       root.attributes("-topmost", True)
 
       global file_put     
@@ -196,6 +197,14 @@ def fileopen():
             eel.my_javascript_function(f"✓ Выбран файл реестра: {file_put}")
             
       return file_put
+
+
+@eel.expose
+def resultfileopen():
+        
+      # Exposing the random_python function to javascript   
+      subprocess.Popen([file_put], shell = True)
+
 
 @eel.expose
 def start_search_js():
