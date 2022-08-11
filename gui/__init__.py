@@ -45,7 +45,7 @@ class App(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             self.hide()
             self.thread.quit()
             self.thread.wait(30000)
-        except AttributeError:
+        except Exception:
             pass
         event.accept()
 

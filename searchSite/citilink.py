@@ -34,7 +34,7 @@ def parseProductCard(browser, url):
 
 def search(driver, query):
     browser = driver.getBrowser()
-    browser.get(f"https://www.citilink.ru/search/?text={query}&sorting=price_asc")
+    browser.get(f"https://www.citilink.ru/search/?text={query}")
     currentUrl = browser.current_url
     if 'search' in currentUrl:
         try:
