@@ -6,9 +6,11 @@ from bs4 import BeautifulSoup
 from . import verified, verifiedSpec
 
 def parseProductCard(browser, url):
+    """Разбор страницы товара с характеристиками"""
+
     try:
         browser.get(url)
-        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.TAG_NAME, 'main')))
+        WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.TAG_NAME, 'main')))
         contentHtml = browser.find_element(By.TAG_NAME, 'main').get_attribute('innerHTML')
         contentHtml = BeautifulSoup(contentHtml, 'lxml')
         productName = contentHtml.find('h1', {'class': 'productPage_title__1B1Yw'}).get_text(strip = True)
@@ -33,12 +35,14 @@ def parseProductCard(browser, url):
     return res
 
 def search(driver, query):
+    """Функция поиска по сайту"""
+
     browser = driver.getBrowser()
     browser.get(f"https://www.regard.ru/catalog?search={query}")
     currentUrl = browser.current_url
     if 'search' in currentUrl or 'catalog' in currentUrl:
         try:
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'rendererWrapper')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'rendererWrapper')))
         except Exception as e:
             return None
         grid = browser.find_element(By.CLASS_NAME, 'rendererWrapper')

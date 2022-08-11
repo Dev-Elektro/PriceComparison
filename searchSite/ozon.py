@@ -6,9 +6,11 @@ from bs4 import BeautifulSoup
 from . import verified, verifiedSpec
 
 def parseProductCard(browser, url):
+    """Разбор страницы товара с характеристиками"""
+
     try:
         browser.get(url)
-        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.ID, 'section-characteristics')))
+        WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.ID, 'section-characteristics')))
         contentHtml = browser.find_element(By.ID, 'layoutPage').get_attribute('innerHTML')
         contentHtml = BeautifulSoup(contentHtml, 'lxml')
         productName = contentHtml.find('div', {'data-widget': 'webProductHeading'}).get_text(strip = True)
@@ -34,12 +36,14 @@ def parseProductCard(browser, url):
     return res
 
 def search(driver, query):
+    """Функция поиска по сайту"""
+
     browser = driver.getBrowser()
     browser.get(f"https://www.ozon.ru/search/?text={query}")
     currentUrl = browser.current_url
     if 'search' in currentUrl or 'category' in currentUrl:
         try:
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CSS_SELECTOR, '.widget-search-result-container')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CSS_SELECTOR, '.widget-search-result-container')))
         except Exception as e:
             return None
         grid = browser.find_element(By.CSS_SELECTOR, '.widget-search-result-container')

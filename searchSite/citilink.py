@@ -6,9 +6,12 @@ from bs4 import BeautifulSoup
 from . import verified, verifiedSpec
 
 def parseProductCard(browser, url):
+    """Разбор страницы товара с характеристиками"""
+
     try:
         browser.get(f"{url}properties/")
-        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'SpecificationsFull')))
+        # Ожидание загрузки всех ajax-запросов
+        WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'SpecificationsFull')))
         contentHtml = browser.find_element(By.ID, 'content').get_attribute('innerHTML')
         contentHtml = BeautifulSoup(contentHtml, 'lxml')
         productName = contentHtml.find('h1', {'class': 'ProductHeader__title'}).get_text(strip = True)
@@ -33,12 +36,14 @@ def parseProductCard(browser, url):
     return res
 
 def search(driver, query):
+    """Функция поиска по сайту"""
+
     browser = driver.getBrowser()
     browser.get(f"https://www.citilink.ru/search/?text={query}")
     currentUrl = browser.current_url
     if 'search' in currentUrl:
         try:
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
         except Exception as e:
             return None
 
