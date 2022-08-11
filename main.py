@@ -6,15 +6,18 @@ from searchSite import Driver, citilink, regard, dnsshop, ozon
 from cgitb import text
 from tkinter import filedialog
 from tkinter import *
+from tkinter.filedialog import askopenfilename
 from numpy import append
 import subprocess
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Alignment
 import traceback
+import eel
+from random import randint
 
 driver = Driver(headless = False)
-driver.start()
+
 #s = input("Поиск: ")
 
 
@@ -34,8 +37,16 @@ def read_file_index():
       f.close()
       return rindex
 
+
+
 #(путь к файлу, имя листа, буква основной колонки, буква резервной колонки, имя столбца основного, имя функции поиска цены, имя столбца записи, буква столбца записи)
+@eel.expose
 def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, function_search, name_sheet_write, name_write, name_col_write):
+      driver.start()
+      eel.js_wait()
+      name_of_magaz=function_search.__name__
+      name_of_magaz=name_of_magaz.replace("searchSite.","")
+      eel.my_javascript_function(f"• Запустили поиск по магазину {name_of_magaz}")
       check=False
       if not os.path.exists("index.txt"):
         open("index.txt", 'w').close()
@@ -61,6 +72,7 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
             if check==True:
                   if cell.value and cell.value!=name_of_cell:
                         print(cell.value)
+                        
                         index_of_table=read_file_index()
                         if index_of_table:
                               coordinate_now=int(index_of_table)
@@ -79,10 +91,11 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
                                     print(f"{i.get('name')} - Цена: {i.get('price')}\n")
                                     citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
                                 print(citilink_result)
+                                
 
                                 if citilink_result:
                                     result_search=str(citilink_result)
-                                    write2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                    write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
                                     coordinate_now=int(coordinate_now)+1
                                     write_file_index(str(coordinate_now))
                                 else:
@@ -98,21 +111,25 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
                                         print(f"{i.get('name')} - Цена: {i.get('price')}\n")
                                         citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
                                     print(citilink_result)
+                                    #eel.my_javascript_function(citilink_result)
 
                                     if citilink_result:
                                         result_search=str(citilink_result)
-                                        write2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                        write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
                                         coordinate_now=int(coordinate_now)+1
                                         write_file_index(str(coordinate_now))
                                     else:
                                         result_search="Нет"
-                                        write2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                        write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
                                         coordinate_now=int(coordinate_now)+1
                                         write_file_index(str(coordinate_now))
 
       write_file_index("") #очищаем файл с индексом
       write_file_index_nach("") #очищаем файл с начальным индексом
-      print(f"Выполнен поиск по магазину {function_search}")
+      print(f" Выполнен поиск по магазину {name_of_magaz}")
+      eel.my_javascript_function(f"✓ Завершен поиск по магазину {name_of_magaz}")
+      eel.js_gotovo()
+      driver.stop()
       
 
 
@@ -157,11 +174,50 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2)
 
       wb.save(xlsx)
       print(f"Выполнена запись в файл")
+      
 
 
-read2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',"Отчет","c","b","Наименование необходимых позиций",citilink,"Отчет","h","Примечание")
-read2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',"Отчет","c","b","Наименование необходимых позиций",regard,"Отчет","n","Примечание")
-read2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',"Отчет","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
+
+
+@eel.expose
+def fileopen():
+        
+      # Exposing the random_python function to javascript   
+      root = Tk()
+      root.attributes('-toolwindow', True)
+      root.eval('tk::PlaceWindow . center')
+      root.attributes("-topmost", True)
+
+      global file_put     
+      file_put=askopenfilename()
+      root.destroy()
+      print(file_put)
+      if(file_put):
+            eel.my_javascript_function(f"✓ Выбран файл реестра: {file_put}")
+            
+      return file_put
+
+@eel.expose
+def start_search_js():
+      read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",citilink,"Отчет","h","Примечание")
+      read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",regard,"Отчет","h","Примечание")
+      read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",dnsshop,"Отчет","h","Примечание")
+
+
+
+
+def website():
+      eel.init("web")
+      
+# Start the index.html file
+      eel.start("index.html",size=(1400, 1000))
+
+
+#read2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',"Отчет","c","b","Наименование необходимых позиций",citilink,"Отчет","h","Примечание")
+#read2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',"Отчет","c","b","Наименование необходимых позиций",regard,"Отчет","n","Примечание")
+#read2_xlsx('Итоговый реестр ШАБЛОН_2.xlsx',"Отчет","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
+
+website()
 """
 buf = regard.search(driver, s)
 print("\nRegard:\n")
@@ -182,6 +238,6 @@ for i in buf:
     print(f"{i.get('name')} - Цена: {i.get('price')}\n")
 """
 driver.stop()
-input("\nНажми Enter для завершения...")
+#input("\nНажми Enter для завершения...")
 
 quit()
