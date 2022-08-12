@@ -15,6 +15,7 @@ from openpyxl.styles import PatternFill, Font, Alignment
 import traceback
 import eel
 from random import randint
+import shutil
 
 driver = Driver(headless = False)
 
@@ -190,13 +191,21 @@ def fileopen():
       root.attributes("-topmost", True)
 
       global file_put     
-      file_put=askopenfilename()
+      file_put=askopenfilename(filetypes = (("Книга Excel","*.xlsx"),("Книга Excel 2003","*.xls")))
       root.destroy()
       print(file_put)
-      if(file_put):
-            eel.my_javascript_function(f"✓ Выбран файл реестра: {file_put}")
-            
-      return file_put
+      if(file_put):                   
+            thisFile = file_put
+            base = os.path.splitext(thisFile)[0]
+            suffix=os.path.splitext(thisFile)[1]
+            dst_file=base+"_ОБРАБОТАН"+suffix
+            print(dst_file)
+            shutil.copyfile(file_put,dst_file)
+            #делаем копированный и переименованнный файл основным
+            file_put=dst_file
+            eel.my_javascript_function(f"✓ Сделана копия и обработается файл реестра: {file_put}") 
+            return thisFile
+      
 
 
 @eel.expose
