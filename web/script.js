@@ -32,8 +32,6 @@ document.querySelector("#choosefile").onclick = function () {
 //открыть файл
 document.querySelector("#openresultfile").onclick = function () {  
    // Call python's random_python function
-  
-  
     // Update the div with a random number returned by python
     
     if (document.querySelector("#outfilename").innerHTML)
@@ -41,11 +39,8 @@ document.querySelector("#openresultfile").onclick = function () {
       eel.resultfileopen();
     }
     else
-    {alert( "Нет файла реестра... ошибка, откройте вручную" );}
-  
+    {alert( "Нет файла реестра... ошибка, откройте вручную" );}  
 }
-
-
 
 
 eel.expose(js_wait);
@@ -79,7 +74,6 @@ eel.expose(my_checkbox_function);
 function my_checkbox_function() {
   if((document.querySelector("#checkbox-e85e").checked==true) || (document.querySelector("#checkbox-a03c").checked==true) || (document.querySelector("#checkbox-0521").checked==true))
   {
-    
     ok="OK"
     console.log("srabotalo")
     return ok
@@ -113,7 +107,6 @@ function check_regard()
     ch="regard"
     return ch;
   }
-  
 }
 
 eel.expose(check_dns);
@@ -127,7 +120,6 @@ function check_dns()
   }
   
 }
-
 
 
 document.querySelector("#startsearch").onclick = async function () {
@@ -147,8 +139,6 @@ document.querySelector("#startsearch").onclick = async function () {
   {
     alert( "Необходимо выбрать поставщика для поиска!!!" );
   }
-  
- 
   
 }
 
