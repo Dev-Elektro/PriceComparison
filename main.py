@@ -168,6 +168,7 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2)
             else:
                   megre_cell =ws[yacheyka]
                   ws[yacheyka]=list_zapis
+                  megre_cell.fill = PatternFill('solid', fgColor="ffffff")
                   megre_cell.font = Font(name='Times New Roman', size=11)
                   rd = ws.row_dimensions[int(nomer2)] # get dimension for row
                   rd.height=70
@@ -206,19 +207,36 @@ def resultfileopen():
       subprocess.Popen([file_put], shell = True)
 
 
+
+
 @eel.expose
 def start_search_js():
-      read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",citilink,"Отчет","h","Примечание")
-      read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",regard,"Отчет","n","Примечание")
-      read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
+      ch_allcheck=eel.my_checkbox_function()()
+      print (ch_allcheck)
+      if ch_allcheck == "OK" :
+            ch_citilink=eel.check_citilink()()
+            ch_regard=eel.check_regard()()
+            ch_dns=eel.check_dns()()
+            if ch_citilink == "citilink":
+                  read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",citilink,"Отчет","h","Примечание")
+            if ch_regard == "regard":
+                  read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",regard,"Отчет","n","Примечание")
+            if ch_dns == "dns":
+                  read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
+      
+
 
 
 
 
 def website():
+      os.environ["GOOGLE_API_KEY"] = "no"
+      os.environ["GOOGLE_DEFAULT_CLIENT_ID"] = "no"
+      os.environ["GOOGLE_DEFAULT_CLIENT_SECRET"] = "no"
       eel.init("web")
       
 # Start the index.html file
+      eel.browsers.set_path("chrome", "chrome-win/chrome.exe")
       eel.start("index.html",size=(1400, 1000))
 
 

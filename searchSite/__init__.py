@@ -11,6 +11,7 @@ class Driver():
         self.options.add_argument("start-maximized")
         self.options.add_experimental_option("excludeSwitches", ["enable-logging", "enable-automation"])
         self.options.add_experimental_option('useAutomationExtension', False)
+        self.options.binary_location = "chrome-win/chrome.exe"
 
         self.s = Service('chromedriver.exe')
 
