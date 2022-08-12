@@ -191,7 +191,7 @@ def fileopen():
       root.attributes("-topmost", True)
 
       global file_put     
-      file_put=askopenfilename(filetypes = (("Книга Excel","*.xlsx"),("Книга Excel 2003","*.xls")))
+      file_put=askopenfilename(defaultextension=".xslx",filetypes = [("Книга Excel","*.xlsx")])
       root.destroy()
       print(file_put)
       if(file_put):                   
