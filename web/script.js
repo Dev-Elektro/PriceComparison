@@ -2,7 +2,7 @@ toastr.options = {
   "closeButton": false,
   "debug": false,
   "newestOnTop": false,
-  "progressBar": false,
+  "progressBar": true,
   "positionClass": "toast-top-center",
   "preventDuplicates": false,
   "onclick": null,
@@ -58,6 +58,7 @@ document.querySelector("#openresultfile").onclick = function () {
     
     if (document.querySelector("#outfilename").innerHTML)
     {
+      toastr.success("Запускаем обработанный файл");
       eel.resultfileopen();
     }
     else
@@ -84,6 +85,7 @@ function js_gotovo() {
   document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-2").style=("display");
   document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-5").innerHTML="Работы завершены!";
   document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-3").style=("display");
+  toastr.info("Текущий этап отработан");
 }
 
 
