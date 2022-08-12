@@ -1,3 +1,21 @@
+toastr.options = {
+  "closeButton": false,
+  "debug": false,
+  "newestOnTop": false,
+  "progressBar": false,
+  "positionClass": "toast-top-center",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "500",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+
 document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display:none")
 document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-3").style=("display:none");
 document.querySelector(".u-text.u-text-palette-1-light-1.u-text-3").style=("display:none");
@@ -6,9 +24,10 @@ document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-2
 document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-5").style=("display:none")
 
 
-// Onclick of the button
+// Onclick of the button выбор файла
 document.querySelector("#choosefile").onclick = function () {  
   document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display:none")
+  document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-3").style=("display:none");
   document.querySelector("#outputpython").innerHTML = "Вывод работы программы.";
   document.querySelector("#outfilename").innerHTML = "Выберите файл реестра.";
   // Call python's random_python function
@@ -20,9 +39,12 @@ document.querySelector("#choosefile").onclick = function () {
     if (document.querySelector("#outfilename").innerHTML)
     {
     document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display")
+    toastr.success("Выбран файл для обработки");
     }
     else
-    {alert( "Необходимо выбрать файл реестра для обработки" );}
+    {//alert( "Необходимо выбрать файл реестра для обработки" );
+    toastr.error("Необходимо выбрать файл реестра для обработки");
+  }
   
   })
   
@@ -39,7 +61,8 @@ document.querySelector("#openresultfile").onclick = function () {
       eel.resultfileopen();
     }
     else
-    {alert( "Нет файла реестра... ошибка, откройте вручную" );}  
+    {//alert( "Нет файла реестра... ошибка, откройте вручную" );
+    toastr.error("Нет файла реестра... ошибка, откройте вручную");}  
 }
 
 
@@ -133,11 +156,13 @@ document.querySelector("#startsearch").onclick = async function () {
     if( document.querySelector("#checkbox-0521").checked==true)
     {document.querySelector("#outputpython").innerHTML = document.querySelector("#outputpython").innerHTML + "<br>" + "•Выбран поставщик DNS" ;}
   document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display:none");
+  toastr.success("Запущен поиск!!!");
   eel.start_search_js();
   }
   else
   {
-    alert( "Необходимо выбрать поставщика для поиска!!!" );
+    //alert( "Необходимо выбрать поставщика для поиска!!!" );
+    toastr.error("Необходимо выбрать поставщика для поиска!!!");
   }
   
 }

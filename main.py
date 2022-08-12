@@ -182,7 +182,6 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2)
 
 @eel.expose
 def fileopen():
-        
       # Exposing the random_python function to javascript   
       root = Tk()
       root.attributes('-toolwindow', True)
@@ -207,8 +206,6 @@ def resultfileopen():
       subprocess.Popen([file_put], shell = True)
 
 
-
-
 @eel.expose
 def start_search_js():
       ch_allcheck=eel.my_checkbox_function()()
@@ -224,9 +221,6 @@ def start_search_js():
             if ch_dns == "dns":
                   read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
       
-
-
-
 
 
 def website():
