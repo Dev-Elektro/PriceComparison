@@ -33,6 +33,7 @@ class Driver():
     def getBrowser(self):
         return self.driver
 
+
 def verified(txt, query):
     queryItems = query.split(" ")
     return not len(queryItems) - sum(True for i in queryItems if i.lower() in txt.lower())
