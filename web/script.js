@@ -26,8 +26,11 @@ document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-te
 
 // Onclick of the button выбор файла
 document.querySelector("#choosefile").onclick = function () {  
-  document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display:none")
+  document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-2").style=("display:none");
   document.querySelector(".u-btn.u-btn-round.u-button-style.u-gradient.u-none.u-radius-4.u-text-body-alt-color.u-btn-3").style=("display:none");
+  document.querySelector(".u-image.u-image-circle.u-preserve-proportions.u-image-2").style=("display:none");
+  document.querySelector(".u-align-center.u-custom-font.u-font-lobster.u-text.u-text-default.u-text-5").style=("display:none");
+  
   document.querySelector("#outputpython").innerHTML = "Вывод работы программы.";
   document.querySelector("#outfilename").innerHTML = "Выберите файл реестра.";
   // Call python's random_python function
