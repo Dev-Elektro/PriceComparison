@@ -6,9 +6,12 @@ from bs4 import BeautifulSoup
 from . import verified, verifiedSpec
 
 def parseProductCard(browser, url):
+    """Разбор страницы товара с характеристиками"""
+
     try:
         browser.get(f"{url}properties/")
-        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'SpecificationsFull')))
+        # Ожидание загрузки всех ajax-запросов
+        WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'SpecificationsFull')))
         contentHtml = browser.find_element(By.ID, 'content').get_attribute('innerHTML')
         contentHtml = BeautifulSoup(contentHtml, 'lxml')
         productName = contentHtml.find('h1', {'class': 'ProductHeader__title'}).get_text(strip = True)
@@ -33,12 +36,14 @@ def parseProductCard(browser, url):
     return res
 
 def search(driver, query):
+    """Функция поиска по сайту"""
+
     browser = driver.getBrowser()
-    browser.get(f"https://www.citilink.ru/search/?text={query}&sorting=price_asc")
+    browser.get(f"https://www.citilink.ru/search/?text={query}")
     currentUrl = browser.current_url
     if 'search' in currentUrl:
         try:
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
         except Exception as e:
             return None
 
@@ -52,11 +57,14 @@ def search(driver, query):
                 link = f"https://www.citilink.ru{element.find('a', {'class': 'ProductCardVertical__name'}).get('href')}"
             except Exception as e:
                 continue
-            if not verified(productName, query):
+            ver = verified(productName, query)
+            if ver == 0:
+                continue
+            elif ver < 100:
                 res = parseProductCard(browser, link)
                 if not res:
                     continue
-                if not verifiedSpec(res.get('name'), res.get('specifications'), query):
+                if verifiedSpec(res.get('name'), res.get('specifications'), query) == 0:
                     continue
             yield {
                 'name': productName,
@@ -66,7 +74,7 @@ def search(driver, query):
     elif 'product' in currentUrl:
         res = parseProductCard(browser, currentUrl)
         if res:
-            if verifiedSpec(res.get('name'), res.get('specifications'), query):
+            if verifiedSpec(res.get('name'), res.get('specifications'), query) == 100:
                 yield {
                     'name': res.get('name'),
                     'price': res.get('price'),

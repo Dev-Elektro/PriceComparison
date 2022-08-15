@@ -37,9 +37,9 @@ def read_file_index():
 
 
 
-#(путь к файлу, имя листа, буква основной колонки, буква резервной колонки, имя столбца основного, имя функции поиска цены, имя столбца записи, буква столбца записи)
+#(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного, имя функции поиска цены, имя столбца записи, буква столбца записи)
 @eel.expose
-def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, function_search, name_sheet_write, name_write, name_col_write):
+def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, name_of_cell, reserv_name_of_cell, function_search, name_sheet_write, name_write, name_col_write):
       driver.start()
       eel.js_wait()
       name_of_magaz=function_search.__name__
@@ -54,73 +54,105 @@ def read2_xlsx(xlsx, sheet_name, column_number,reserv_column, name_of_cell, func
       #name_of_cell="Примечание"
       list_result=[]
       wb = load_workbook(xlsx)
-      ws = wb[sheet_name]
-      column=ws[column_number]
-      dlina=len(column)
+      ws = wb[sheet_name_reserv]
+      column=ws[reserv_column]
+      
       #проверка наименования столбца
       for cell in column:
-            if cell.value==name_of_cell:
-                  #print(cell.value)
+            if cell.value==reserv_name_of_cell:
+                  print(cell.value)
                   check=True
                   coordinatenachcalo=cell.row
                   print(coordinatenachcalo)
                   write_file_index_nach(str(coordinatenachcalo))
+                  coordinate_now=int(coordinatenachcalo)+1
+                  write_file_index(str(coordinate_now))
+      dlina=0
+      for i in column:
+            if i.value:
+                  dlina+=1
+      print(f"длина{dlina}")
+      dlina=int(dlina)+int(coordinatenachcalo)
+      print(f"Будет поиск по {dlina} строкам")
       #считывание данных
-      for cell in column:
+      ws = wb[sheet_name]
+      column=ws[column_number]
+      for index,cell in  enumerate(column):
+            #print(f"индекс таков {index}")
+            if index==dlina:
+                  break
             if check==True:
-                  if cell.value and cell.value!=name_of_cell:
-                        print(cell.value)
+                        #print(cell.value)
                         
                         index_of_table=read_file_index()
                         if index_of_table:
                               coordinate_now=int(index_of_table)
-                        else:
-                              coordinate_now=cell.row
-                              write_file_index(str(coordinate_now))
+                        
                         if cell.row >= coordinate_now:
-                                letter0=cell.column_letter
-                                print(letter0, coordinate_now)
-                                #list_result.extend([[cell.value,coordinate0]])
-                                #print(list_result)
-                                #result_search=search(cell.value)
-                                buf = function_search.search(driver, cell.value)
-                                citilink_result=""
-                                for i in buf:
-                                    print(f"{i.get('name')} - Цена: {i.get('price')}\n")
-                                    citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
-                                print(citilink_result)
-                                
+                              letter0=cell.column_letter
+                              print(letter0, coordinate_now)
+                              #list_result.extend([[cell.value,coordinate0]])
+                              #print(list_result)
+                              #result_search=search(cell.value)
+                              print(cell.value)
+                              yacheika_main=str(column_number)+str(cell.row)
+                              ws = wb[sheet_name]
+                              plan_main=ws[yacheika_main]
+                              print (yacheika_main)
+                              print(plan_main.value)
+                              
+                              if plan_main.value:
+                                    buf = function_search.search(driver, cell.value)
+                                    citilink_result=""
+                                    for index, i in enumerate(buf):
+                                          if index==10:
+                                                break
+                                          print(f"{i.get('name')} - Цена: {i.get('price')}\n")
+                                          citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
+                                    print(citilink_result)
+                                                               
+                                    if citilink_result:
+                                          result_search=str(citilink_result)
+                                          write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                          coordinate_now=int(coordinate_now)+1
+                                          write_file_index(str(coordinate_now))
+                                    else:
+                                          result_search="Нет"
+                                          write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                          coordinate_now=int(coordinate_now)+1
+                                          write_file_index(str(coordinate_now))
 
-                                if citilink_result:
-                                    result_search=str(citilink_result)
-                                    write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
-                                    coordinate_now=int(coordinate_now)+1
-                                    write_file_index(str(coordinate_now))
-                                else:
+                              else:
                                     print("Ищем по резервному названию")
                                     yacheika=str(reserv_column)+str(cell.row)
+                                    ws = wb[sheet_name_reserv]
                                     planB=ws[yacheika]
                                     print (yacheika)
                                     print(planB.value)
-                                    buf = function_search.search(driver, planB.value)
-                                    citilink_result=""
 
-                                    for i in buf:
-                                        print(f"{i.get('name')} - Цена: {i.get('price')}\n")
-                                        citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
-                                    print(citilink_result)
-                                    #eel.my_javascript_function(citilink_result)
+                                    if planB.value:
+                                          buf = function_search.search(driver, planB.value)
+                                          citilink_result=""
 
-                                    if citilink_result:
-                                        result_search=str(citilink_result)
-                                        write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
-                                        coordinate_now=int(coordinate_now)+1
-                                        write_file_index(str(coordinate_now))
-                                    else:
-                                        result_search="Нет"
-                                        write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
-                                        coordinate_now=int(coordinate_now)+1
-                                        write_file_index(str(coordinate_now))
+                                          for index, i in enumerate(buf):
+                                                if index==10:
+                                                      break
+                                                print(f"{i.get('name')} - Цена: {i.get('price')}\n")
+                                                citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
+                                          print(citilink_result)
+                                          #eel.my_javascript_function(citilink_result)
+
+                                          if citilink_result:
+                                                result_search=str(citilink_result)
+                                                write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                                coordinate_now=int(coordinate_now)+1
+                                                write_file_index(str(coordinate_now))
+                                          else:
+                                                result_search="Нет"
+                                                write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                                coordinate_now=int(coordinate_now)+1
+                                                write_file_index(str(coordinate_now))
+                                    
 
       write_file_index("") #очищаем файл с индексом
       write_file_index_nach("") #очищаем файл с начальным индексом
@@ -221,11 +253,12 @@ def start_search_js():
             ch_regard=eel.check_regard()()
             ch_dns=eel.check_dns()()
             if ch_citilink == "citilink":
-                  read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",citilink,"Отчет","h","Примечание")
+#(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, имя столбца записи, буква столбца записи)
+                  read2_xlsx(file_put,"Запрос КП4","Реестр","h","d","Примечание","Наименование необходимых позиций",citilink,"Запрос КП4","e","Цена за 1шт")
             if ch_regard == "regard":
-                  read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",regard,"Отчет","n","Примечание")
+                  read2_xlsx(file_put,"Запрос КП4","c","b","Наименование необходимых позиций",regard,"Отчет","n","Примечание")
             if ch_dns == "dns":
-                  read2_xlsx(file_put,"Отчет","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
+                  read2_xlsx(file_put,"Запрос КП4","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
       
 
 
