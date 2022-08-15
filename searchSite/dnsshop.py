@@ -6,10 +6,12 @@ from bs4 import BeautifulSoup
 from . import verified, verifiedSpec
 
 def parseProductCard(browser, url):
+    """Разбор страницы товара с характеристиками"""
+
     try:
         browser.get(f"{url}characteristics/")
-        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'product-card-description')))
-        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'product-buy__price')))
+        WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'product-card-description')))
+        WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'product-buy__price')))
         contentHtml = browser.find_element(By.CSS_SELECTOR, '.container.product-card').get_attribute('innerHTML')
         contentHtml = BeautifulSoup(contentHtml, 'lxml')
         if contentHtml.find('div', {'class': 'order-avail-wrap order-avail-wrap_not-avail'}):
@@ -36,14 +38,16 @@ def parseProductCard(browser, url):
     return res
 
 def search(driver, query):
+    """Функция поиска по сайту"""
+
     browser = driver.getBrowser()
     browser.get(f"https://www.dns-shop.ru/search/?q={query}")
     currentUrl = browser.current_url
     if 'search' in currentUrl or 'catalog' in currentUrl:
         try:
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'products-list__content')))
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'product-buy__price-wrap')))
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'order-avail-wrap')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'products-list__content')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'product-buy__price-wrap')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'order-avail-wrap')))
         except Exception as e:
             return None
 
@@ -60,11 +64,14 @@ def search(driver, query):
                 continue
             if not availability:
                 continue
-            if not verified(productName, query):
+            ver = verified(productName, query)
+            if ver == 0:
+                continue
+            elif ver < 100:
                 res = parseProductCard(browser, link)
                 if not res:
                     continue
-                if not verifiedSpec(res.get('name'), res.get('specifications'), query):
+                if verifiedSpec(res.get('name'), res.get('specifications'), query) == 0:
                     continue
             yield {
                 'name': productName,
@@ -74,7 +81,7 @@ def search(driver, query):
     elif 'product' in currentUrl:
         res = parseProductCard(browser, currentUrl)
         if res:
-            if verifiedSpec(res.get('name'), res.get('specifications'), query):
+            if verifiedSpec(res.get('name'), res.get('specifications'), query) == 100:
                 yield {
                     'name': res.get('name'),
                     'price': res.get('price'),

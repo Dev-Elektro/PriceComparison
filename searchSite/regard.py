@@ -6,9 +6,11 @@ from bs4 import BeautifulSoup
 from . import verified, verifiedSpec
 
 def parseProductCard(browser, url):
+    """Разбор страницы товара с характеристиками"""
+
     try:
         browser.get(url)
-        WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.TAG_NAME, 'main')))
+        WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.TAG_NAME, 'main')))
         contentHtml = browser.find_element(By.TAG_NAME, 'main').get_attribute('innerHTML')
         contentHtml = BeautifulSoup(contentHtml, 'lxml')
         productName = contentHtml.find('h1', {'class': 'productPage_title__1B1Yw'}).get_text(strip = True)
@@ -33,12 +35,14 @@ def parseProductCard(browser, url):
     return res
 
 def search(driver, query):
+    """Функция поиска по сайту"""
+
     browser = driver.getBrowser()
     browser.get(f"https://www.regard.ru/catalog?search={query}")
     currentUrl = browser.current_url
     if 'search' in currentUrl or 'catalog' in currentUrl:
         try:
-            WebDriverWait(browser, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, 'rendererWrapper')))
+            WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'rendererWrapper')))
         except Exception as e:
             return None
         grid = browser.find_element(By.CLASS_NAME, 'rendererWrapper')
@@ -51,11 +55,14 @@ def search(driver, query):
                 link = f"https://www.regard.ru{element.find('a', {'class': 'CardText_link__2H3AZ'}).get('href')}"
             except Exception as e:
                 continue
-            if not verified(productName, query):
+            ver = verified(productName, query)
+            if ver == 0:
+                continue
+            elif ver < 100:
                 res = parseProductCard(browser, link)
                 if not res:
                     continue
-                if not verifiedSpec(res.get('name'), res.get('specifications'), query):
+                if verifiedSpec(res.get('name'), res.get('specifications'), query) == 0:
                     continue
             yield {
                 'name': productName,
@@ -65,7 +72,7 @@ def search(driver, query):
     elif 'product' in currentUrl:
         res = parseProductCard(browser, currentUrl)
         if res:
-            if verifiedSpec(res.get('name'), res.get('specifications'), query):
+            if verifiedSpec(res.get('name'), res.get('specifications'), query) == 100:
                 yield {
                     'name': res.get('name'),
                     'price': res.get('price'),
