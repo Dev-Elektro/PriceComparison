@@ -37,7 +37,7 @@ def read_file_index():
 
 
 
-#(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного, имя функции поиска цены, имя столбца записи, буква столбца записи)
+#(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного, имя резервного стобца, имя функции поиска цены, имя столбца записи, буква столбца записи)
 @eel.expose
 def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, name_of_cell, reserv_name_of_cell, function_search, name_sheet_write, name_write, name_col_write):
       driver.start()
