@@ -68,6 +68,7 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                   coordinate_now=int(coordinatenachcalo)+1
                   write_file_index(str(coordinate_now))
       dlina=0
+      dlina_str=0
       for i in column:
             if i.value:
                   dlina+=1
@@ -105,20 +106,22 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                     buf = function_search.search(driver, cell.value)
                                     citilink_result=""
                                     for index, i in enumerate(buf):
-                                          if index==10:
+                                          if index==4:
                                                 break
                                           print(f"{i.get('name')} - Цена: {i.get('price')}\n")
                                           citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
+                                    print(f"Индекс для записи = {index}")
                                     print(citilink_result)
+                                    dlina_str=index
                                                                
                                     if citilink_result:
                                           result_search=str(citilink_result)
-                                          write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                          write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                           coordinate_now=int(coordinate_now)+1
                                           write_file_index(str(coordinate_now))
                                     else:
                                           result_search="Нет"
-                                          write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                          write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                           coordinate_now=int(coordinate_now)+1
                                           write_file_index(str(coordinate_now))
 
@@ -135,21 +138,24 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                           citilink_result=""
 
                                           for index, i in enumerate(buf):
-                                                if index==10:
+                                                if index==4:
                                                       break
                                                 print(f"{i.get('name')} - Цена: {i.get('price')}\n")
                                                 citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
                                           print(citilink_result)
+                                          print(f"Индекс для записи = {index}")
+                                          dlina_str=index
+
                                           #eel.my_javascript_function(citilink_result)
 
                                           if citilink_result:
                                                 result_search=str(citilink_result)
-                                                write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                                write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                                 coordinate_now=int(coordinate_now)+1
                                                 write_file_index(str(coordinate_now))
                                           else:
                                                 result_search="Нет"
-                                                write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now)
+                                                write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                                 coordinate_now=int(coordinate_now)+1
                                                 write_file_index(str(coordinate_now))
                                     
@@ -164,7 +170,7 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
 
 
 #(путь к файлу, имя листа, буква основной колонки, имя столбца основного, данные для записи, номер ячейки)
-def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2):
+def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,dlina_str):
       check=False
       #xlsx='E:\\D disk\WorK\\bat source and compile\\Python\\priceZADA4a\\Итоговый реестр ШАБЛОН_2.xlsx'
       #sheet_name="Отчет"
@@ -196,12 +202,22 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2)
                  rd = ws.row_dimensions[int(nomer2)] # get dimension for row
                  rd.height=70
             else:
-                  megre_cell =ws[yacheyka]
-                  ws[yacheyka]=list_zapis
-                  megre_cell.fill = PatternFill('solid', fgColor="ffffff")
-                  megre_cell.font = Font(name='Times New Roman', size=11)
-                  rd = ws.row_dimensions[int(nomer2)] # get dimension for row
-                  rd.height=70
+                  if dlina_str>1:
+                        print(f" Длина {dlina_str}")
+                        megre_cell =ws[yacheyka]
+                        ws[yacheyka]=list_zapis
+                        megre_cell.fill = PatternFill('solid', fgColor="6495ed")
+                        megre_cell.font = Font(name='Times New Roman', size=11)
+                        rd = ws.row_dimensions[int(nomer2)] # get dimension for row
+                        rd.height=70
+                  else:
+                        print(f" Длина {dlina_str}")
+                        megre_cell =ws[yacheyka]
+                        ws[yacheyka]=list_zapis
+                        megre_cell.fill = PatternFill('solid', fgColor="ffffff")
+                        megre_cell.font = Font(name='Times New Roman', size=11)
+                        rd = ws.row_dimensions[int(nomer2)] # get dimension for row
+                        rd.height=70
 
       wb.save(xlsx)
       print(f"Выполнена запись в файл")
@@ -256,9 +272,9 @@ def start_search_js():
 #(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, имя столбца записи, буква столбца записи)
                   read2_xlsx(file_put,"Запрос КП4","Реестр","h","d","Примечание","Наименование необходимых позиций",citilink,"Запрос КП4","e","Цена за 1шт")
             if ch_regard == "regard":
-                  read2_xlsx(file_put,"Запрос КП4","c","b","Наименование необходимых позиций",regard,"Отчет","n","Примечание")
+                  read2_xlsx(file_put,"Запрос КП5","Реестр","h","d","Примечание","Наименование необходимых позиций",regard,"Запрос КП5","e","Цена за 1шт")
             if ch_dns == "dns":
-                  read2_xlsx(file_put,"Запрос КП4","c","b","Наименование необходимых позиций",dnsshop,"Отчет","t","Примечание")
+                  read2_xlsx(file_put,"Запрос КП6","Реестр","h","d","Примечание","Наименование необходимых позиций",dnsshop,"Запрос КП6","e","Цена за 1шт")
       
 
 
