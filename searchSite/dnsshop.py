@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
-from . import verified, verifiedSpec
+from . import searchProcessing
 
 def parseProductCard(browser, url):
     """Разбор страницы товара с характеристиками"""
@@ -37,9 +37,7 @@ def parseProductCard(browser, url):
         return None
     return res
 
-def search(driver, query):
-    """Функция поиска по сайту"""
-
+def getData(driver, query):
     browser = driver.getBrowser()
     browser.get(f"https://www.dns-shop.ru/search/?q={query}")
     currentUrl = browser.current_url
@@ -64,26 +62,22 @@ def search(driver, query):
                 continue
             if not availability:
                 continue
-            ver = verified(productName, query)
-            if ver == 0:
-                continue
-            elif ver < 100:
-                res = parseProductCard(browser, link)
-                if not res:
-                    continue
-                if verifiedSpec(res.get('name'), res.get('specifications'), query) == 0:
-                    continue
             yield {
                 'name': productName,
                 'price': productPrice,
-                'url': f'{link}'
+                'url': f'{link}',
+                'specifications': None
             }
     elif 'product' in currentUrl:
         res = parseProductCard(browser, currentUrl)
         if res:
-            if verifiedSpec(res.get('name'), res.get('specifications'), query) == 100:
-                yield {
-                    'name': res.get('name'),
-                    'price': res.get('price'),
-                    'url': currentUrl
-                }
+            yield {
+                'name': res.get('name'),
+                'price': res.get('price'),
+                'url': currentUrl,
+                'specifications': res.get('specifications')
+            }
+
+def search(driver, query):
+    """Функция поиска по сайту"""
+    return searchProcessing(driver, query, getData)

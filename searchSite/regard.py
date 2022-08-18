@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
-from . import verified, verifiedSpec
+from . import searchProcessing
 
 def parseProductCard(browser, url):
     """Разбор страницы товара с характеристиками"""
@@ -34,7 +34,7 @@ def parseProductCard(browser, url):
         return None
     return res
 
-def search(driver, query):
+def getData(driver, query):
     """Функция поиска по сайту"""
 
     browser = driver.getBrowser()
@@ -55,15 +55,6 @@ def search(driver, query):
                 link = f"https://www.regard.ru{element.find('a', {'class': 'CardText_link__2H3AZ'}).get('href')}"
             except Exception as e:
                 continue
-            ver = verified(productName, query)
-            if ver == 0:
-                continue
-            elif ver < 100:
-                res = parseProductCard(browser, link)
-                if not res:
-                    continue
-                if verifiedSpec(res.get('name'), res.get('specifications'), query) == 0:
-                    continue
             yield {
                 'name': productName,
                 'price': productPrice,
@@ -72,9 +63,12 @@ def search(driver, query):
     elif 'product' in currentUrl:
         res = parseProductCard(browser, currentUrl)
         if res:
-            if verifiedSpec(res.get('name'), res.get('specifications'), query) == 100:
-                yield {
-                    'name': res.get('name'),
-                    'price': res.get('price'),
-                    'url': currentUrl
-                }
+            yield {
+                'name': res.get('name'),
+                'price': res.get('price'),
+                'url': currentUrl
+            }
+
+def search(driver, query):
+    """Функция поиска по сайту"""
+    return searchProcessing(driver, query, getData)
