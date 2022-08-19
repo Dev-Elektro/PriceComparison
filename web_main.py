@@ -105,14 +105,25 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                               if plan_main.value:
                                     buf = function_search.search(driver, cell.value)
                                     citilink_result=""
+                                    list_res=[]
                                     for index, i in enumerate(buf):
                                           if index==4:
                                                 break
+                                          
                                           print(f"{i.get('name')} - Цена: {i.get('price')}\n")
-                                          citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
+                                          list_res.extend([[i.get('name'),i.get('price')]])
                                     print(f"Индекс для записи = {index}")
-                                    print(citilink_result)
-                                    dlina_str=index
+                                    print(list_res)
+                                    print(len(list_res))
+                                    dlina_str=len(list_res)
+
+                                    if dlina_str>1:
+                                          for s in list_res:
+                                                citilink_result+=s[0]+" Цена: "+s[1]+"\n"
+                                    else:
+                                          citilink_result=list_res[0][1]                                    
+                                    print(citilink_result)                                   
+
                                                                
                                     if citilink_result:
                                           result_search=str(citilink_result)
@@ -136,18 +147,28 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                     if planB.value:
                                           buf = function_search.search(driver, planB.value)
                                           citilink_result=""
+                                          list_res=[]
 
                                           for index, i in enumerate(buf):
                                                 if index==4:
                                                       break
+                                                
                                                 print(f"{i.get('name')} - Цена: {i.get('price')}\n")
-                                                citilink_result+=i.get('name')+" Цена:"+i.get('price')+"\n"
-                                          print(citilink_result)
+                                                list_res.extend([[i.get('name'),i.get('price')]])
+                                                
+                                          print(list_res)
+                                          print(len(list_res))
                                           print(f"Индекс для записи = {index}")
-                                          dlina_str=index
+                                          dlina_str=len(list_res)
 
+                                          if dlina_str>1:
+                                                for s in list_res:
+                                                      citilink_result+=s[0]+" Цена: "+s[1]+"\n"
+                                          else:
+                                                citilink_result=list_res[0][1]
+                                          print(citilink_result)
+                                          
                                           #eel.my_javascript_function(citilink_result)
-
                                           if citilink_result:
                                                 result_search=str(citilink_result)
                                                 write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
@@ -206,14 +227,14 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,
                         print(f" Длина {dlina_str}")
                         megre_cell =ws[yacheyka]
                         ws[yacheyka]=list_zapis
-                        megre_cell.fill = PatternFill('solid', fgColor="6495ed")
+                        megre_cell.fill = PatternFill('solid', fgColor="ff9494")
                         megre_cell.font = Font(name='Times New Roman', size=11)
                         rd = ws.row_dimensions[int(nomer2)] # get dimension for row
                         rd.height=70
                   else:
                         print(f" Длина {dlina_str}")
                         megre_cell =ws[yacheyka]
-                        ws[yacheyka]=list_zapis
+                        ws[yacheyka]=int(list_zapis)
                         megre_cell.fill = PatternFill('solid', fgColor="ffffff")
                         megre_cell.font = Font(name='Times New Roman', size=11)
                         rd = ws.row_dimensions[int(nomer2)] # get dimension for row
