@@ -112,9 +112,9 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                           
                                           print(f"{i.get('name')} - Цена: {i.get('price')}\n")
                                           list_res.extend([[i.get('name'),i.get('price')]])
-                                    print(f"Индекс для записи = {index}")
-                                    print(list_res)
-                                    print(len(list_res))
+                                    #print(f"Индекс для записи = {index}")
+                                    #print(list_res)
+                                    #print(len(list_res))
                                     dlina_str=len(list_res)
 
                                     if dlina_str>1:
@@ -156,9 +156,9 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                                 print(f"{i.get('name')} - Цена: {i.get('price')}\n")
                                                 list_res.extend([[i.get('name'),i.get('price')]])
                                                 
-                                          print(list_res)
-                                          print(len(list_res))
-                                          print(f"Индекс для записи = {index}")
+                                          #print(list_res)
+                                          #print(len(list_res))
+                                          #print(f"Индекс для записи = {index}")
                                           dlina_str=len(list_res)
 
                                           if dlina_str>1:
