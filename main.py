@@ -3,7 +3,11 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font
 from openpyxl.utils import column_index_from_string as columnIndex
 from searchengine import SearchPool, QueryItem
-from searchengine.presetsite import dnsshop  # , regard, citilink
+from searchengine.presetsite import dnsshop, regard  # , citilink
+
+
+def printLog(name: str, totalCount: int, currentPos: int):
+    log.info(f"{name} {totalCount}\\{currentPos}")
 
 
 def main():
@@ -20,6 +24,8 @@ def main():
         searchQuery.append(QueryItem(rowNum=cell.row, value=query))
     searchPool = SearchPool(processes=4, headless=False)
     searchPool.addTask('DNS-shop', dnsshop, searchQuery, 'Реестр', 'K')
+    searchPool.addTask('Regard', regard, searchQuery, 'Реестр', 'L')
+    searchPool.setCallback(printLog)
     for searchPoolItem in searchPool:
         log.debug(f"Search finish: {searchPoolItem.name} - write to column: {searchPoolItem.columnName}")
         for resultItem in searchPoolItem.result:  # Получаем результат выполнения поиска по сайту

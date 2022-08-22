@@ -1,4 +1,4 @@
-from typing import Protocol, NamedTuple, Iterable
+from typing import Protocol, NamedTuple, Iterable, Callable
 from multiprocessing.pool import ThreadPool
 from searchengine.utils import findPartNumber, wordProcessing
 from searchengine.webdriver import Driver
@@ -46,6 +46,7 @@ class SearchPool:
         self._pool = ThreadPool(processes=processes)
         self._processes = []
         self.headless = headless
+        self.callback = None
 
     def __iter__(self):
         self._pos = 0
@@ -64,13 +65,13 @@ class SearchPool:
         else:
             raise StopIteration
 
-    def _search(self, site: WebSite, cells: Iterable) -> list[ResultItem]:
+    def _search(self, name: str, site: WebSite, cells: Iterable) -> list[ResultItem]:
         """Поиск по списку с запросами из файла. Принимает функцию поиска и список запросов."""
         driver = Driver(headless=self.headless)  # Инициализация вебдрайвера
         driver.start()
         buf = []  # Буфер для найденых результатов, что бы дублирующиеся запросы не искать повторно.
         result = []
-        for cell in cells:  # Перебераем ячейки
+        for pos, cell in enumerate(cells):  # Перебераем ячейки
             log.debug(f"Запрос: {cell.value=}")
             fromBuf = list(filter(lambda x: x[0] == cell.value, buf))  # Проверяем результат для запроса в буфере
             if not fromBuf:
@@ -80,17 +81,24 @@ class SearchPool:
             else:
                 log.debug("Найден в буфере")
                 res = fromBuf[0][1]
+            if not isinstance(self.callback, type(None)):
+                self.callback(name, len(cells), pos + 1)
             result.append(ResultItem(queryValue=cell.value, rowNum=cell.rowNum, listProduct=res))  # Формируем словарь с номером строки ячейки, текстом запроса и результатом поиска.
         driver.stop()
         return result
 
     def addTask(self, name: str, site: WebSite, listQuery: list, sheetName: str, columnName: str):
+        """Добавить задание. addTask(self, name: str, site: WebSite, listQuery: list, sheetName: str, columnName: str)"""
         self._processes.append((
             name,
             sheetName,
             columnName,
-            self._pool.apply_async(self._search, [site, listQuery])
+            self._pool.apply_async(self._search, [name, site, listQuery])
         ))
+
+    def setCallback(self, func: Callable[[str, int, int], None]):
+        """Обратный вызов для отображения хода процесса. Callback(siteName: str, totalCount: int, currentPos: int)"""
+        self.callback = func
 
 
 def _searchByPartNumber(partNumber: str, site: WebSite) -> Iterable[ProductItem]:
