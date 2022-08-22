@@ -21,6 +21,7 @@ def main():
     searchPool = SearchPool(processes=4, headless=False)
     searchPool.addTask('DNS-shop', dnsshop, searchQuery, '', 'K')
     for searchPoolItem in searchPool:
+        log.debug(f"Search finish: {searchPoolItem.name} - write to column: {searchPoolItem.columnName}")
         for resultItem in searchPoolItem.result:  # Получаем результат выполнения поиска по сайту
             result_txt = "\n".join(map(lambda x: f"{x.name} - Цена: {x.price}", resultItem.listProduct))  # Формируем строку результата поска.
             wcell = sheet.cell(row=resultItem.rowNum, column=columnIndex(searchPoolItem.columnName))  # Получаем ячейку в книге для записи результата.
