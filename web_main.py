@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import auto
 import os
 from time import sleep
@@ -280,6 +281,24 @@ def fileopen():
             eel.my_javascript_function(f"✓ Сделана копия и обработается файл реестра: {file_put}") 
             return thisFile
       
+@eel.expose
+def write_toExcel():
+      root = Tk()
+      root.attributes('-toolwindow', True)
+      root.eval('tk::PlaceWindow . center')
+      root.withdraw()
+      root.attributes("-topmost", True)
+      time_write=datetime.now()
+      time_write=time_write.strftime("%d.%m.%Y_%H_%M")
+      root.ass=filedialog.asksaveasfilename(initialdir = "/", initialfile=f"Выгрузка_{time_write}.xlsx",title = "Выбирите куда сохранить",filetypes = (("Книга Excel","*.xlsx"),("all files","*.*")))
+      file_put=root.ass
+      print(file_put)
+      result_excel={'Citilink':citilink_toex,'Regard':regard_toex,'DNS':dns_toex}
+      df = pd.DataFrame.from_dict(result_excel,orient='index')
+      df = df.transpose()
+
+      df.to_excel(file_put, sheet_name='Выгрузка', index_label="№ п/п")
+      subprocess.Popen([file_put], shell = True)
 
 
 @eel.expose
@@ -306,12 +325,74 @@ def start_search_js():
                   read2_xlsx(file_put,"Запрос КП6","Реестр","h","d","Примечание","Наименование необходимых позиций",dnsshop,"Запрос КП6","e","Цена за 1шт")
       
 
+@eel.expose
+def start_search_js_for_one(input_text):
+      if input_text:
+            global citilink_toex,regard_toex,dns_toex
+            #citilink_toex=[]
+            #regard_toex=[]
+            #dns_toex=[]
+            citilink_toex=""
+            regard_toex=""
+            dns_toex=""
+            ch_allcheck=eel.my_checkbox_function()()
+            print (ch_allcheck)
+            if ch_allcheck == "OK" :
+                  ch_citilink=eel.check_citilink()()
+                  ch_regard=eel.check_regard()()
+                  ch_dns=eel.check_dns()()
+                  if ch_citilink == "citilink":
+                        citilink_toex=search_of_one(input_text,citilink)
+                        #citilink_toex.append(citilink_toexf)
+                  if ch_regard == "regard":
+                        regard_toex=search_of_one(input_text,regard)
+                        #regard_toex.append(regard_toexf)
+                  if ch_dns == "dns":
+                        dns_toex=search_of_one(input_text,dnsshop)
+                        #dns_toex.append(dns_toexf)
+      else:
+            eel.js_alert()
+       
 
-def website():
+
+
+@eel.expose
+def search_of_one(input_text, function_search):
+      eel.js_wait()
+      print(input_text, function_search)
+      result_to_site=""
+      result_to_excel=[]
+      driver.start()
+      buf = runSearchBySite(input_text, function_search(driver))
+      result_to_site=f"✓ Результат поиска по магазину {function_search.__name__}"+"<br>"
+      
+      for i in buf:
+            print(f"Вывод функции поиска {i.name} - Цена: {i.price}\n")
+            result_to_site+="<a href=\""+i.url+"\" target=\"_blank\">"+"<font color=\"blue\">"+"• "+i.name+"</font>"+" - Цена: "+i.price+" ₽"+" </a>"+"<br>"
+            result_to_excel.append(i.name+" -Цена:"+i.price)
+            
+
+      print(f"{result_to_site=}")
+      driver.stop()
+      eel.my_output_for_one(result_to_site)
+      eel.js_gotovo()
+
+      return result_to_excel
+
+
+
+
+
+
+
+def website(mode):
       os.environ["GOOGLE_API_KEY"] = "no"
       os.environ["GOOGLE_DEFAULT_CLIENT_ID"] = "no"
       os.environ["GOOGLE_DEFAULT_CLIENT_SECRET"] = "no"
-      eel.init("web")
+      if mode=="reestr":
+            eel.init("web")
+      elif mode=="one":
+            eel.init("web_for_one")
       
 # Start the index.html file
       eel.browsers.set_path("chrome", "chrome-win/chrome.exe")

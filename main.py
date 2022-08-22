@@ -10,7 +10,9 @@ from cgitb import text
 
 #s = input("Поиск: ")
 
-website()
+#website("reestr")
+website("one")
+
 """
 buf = citilink.search(driver, s)
 print("\nCitilink:\n")
