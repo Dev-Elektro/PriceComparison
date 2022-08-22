@@ -125,12 +125,12 @@ class SearchPool:
 
 
 def _searchByPartNumber(partNumber: str, site: WebSite) -> Iterable[ProductItem]:
-    """Поиск по партномеру"""
+    """Поиск по парт номеру"""
     for item in site.search(partNumber):  # Получаем поисковый ответ от сайта
         buf = item.name
-        if spec := item.specifications:  # Если в результате поика есть спецификации, то их собираем в строку
+        if spec := item.specifications:  # Если в результате поиска есть спецификации, то их собираем в строку
             buf += f"{' '.join(map(lambda x: str(x.get('value')), spec))}"
-        if partNumber in buf:  # Проверка совподает ли парт номер с результатом поска
+        if partNumber in buf:  # Проверка совпадает ли парт номер с результатом поиска
             yield item
 
 
@@ -156,7 +156,7 @@ def _searchByText(query: str, site: WebSite) -> Iterable[ProductItem]:
 
 
 def runSearchBySite(query: str, site: WebSite) -> Iterable[ProductItem]:
-    """Поск по интерисующему сайту, возвращает список ProductItem"""
+    """Поиск по интересующему сайту, возвращает список ProductItem"""
     if partNumber := findPartNumber(query):
         return _searchByPartNumber(partNumber, site)
     return _searchByText(query, site)
