@@ -2,7 +2,8 @@ from enum import auto
 import os
 from time import sleep
 from tkinter.messagebox import YESNOCANCEL
-from searchSite import Driver, citilink, regard, dnsshop, ozon
+from searchengine.presetsite import citilink, regard, dnsshop
+from searchengine import Driver, runSearchBySite
 from cgitb import text
 from tkinter import filedialog
 from tkinter import *
@@ -60,10 +61,10 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
       #проверка наименования столбца
       for cell in column:
             if cell.value==reserv_name_of_cell:
-                  print(cell.value)
+                  print(f"Имя стартового столбца={cell.value}")
                   check=True
                   coordinatenachcalo=cell.row
-                  print(coordinatenachcalo)
+                  print(f"{coordinatenachcalo=}")
                   write_file_index_nach(str(coordinatenachcalo))
                   coordinate_now=int(coordinatenachcalo)+1
                   write_file_index(str(coordinate_now))
@@ -72,7 +73,7 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
       for i in column:
             if i.value:
                   dlina+=1
-      print(f"длина{dlina}")
+      print(f"Длина {dlina}")
       dlina=int(dlina)+int(coordinatenachcalo)
       print(f"Будет поиск по {dlina} строкам")
       #считывание данных
@@ -91,27 +92,27 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                         
                         if cell.row >= coordinate_now:
                               letter0=cell.column_letter
-                              print(letter0, coordinate_now)
+                              print(f"Смотрим ячейку {letter0}{coordinate_now}")
                               #list_result.extend([[cell.value,coordinate0]])
                               #print(list_result)
                               #result_search=search(cell.value)
-                              print(cell.value)
                               yacheika_main=str(column_number)+str(cell.row)
                               ws = wb[sheet_name]
                               plan_main=ws[yacheika_main]
-                              print (yacheika_main)
-                              print(plan_main.value)
-                              
+                                                            
                               if plan_main.value:
-                                    buf = function_search.search(driver, cell.value)
+                                    print(f"{plan_main.value=}")
+                                    print (f"{yacheika_main=}")
+                                    buf = runSearchBySite(plan_main.value,function_search(driver))
                                     citilink_result=""
                                     list_res=[]
+                                    
                                     for index, i in enumerate(buf):
                                           if index==4:
                                                 break
                                           
-                                          print(f"{i.get('name')} - Цена: {i.get('price')}\n")
-                                          list_res.extend([[i.get('name'),i.get('price')]])
+                                          print(f"Вывод функции поиска {i.name} - Цена: {i.price}\n")
+                                          list_res.extend([[i.name,i.price]])
                                     #print(f"Индекс для записи = {index}")
                                     #print(list_res)
                                     #print(len(list_res))
@@ -121,8 +122,9 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                           for s in list_res:
                                                 citilink_result+=s[0]+" Цена: "+s[1]+"\n"
                                     else:
-                                          citilink_result=list_res[0][1]                                    
-                                    print(citilink_result)                                   
+                                          if list_res:
+                                                citilink_result=list_res[0][1]                                    
+                                    print(f"{citilink_result=}")                                   
 
                                                                
                                     if citilink_result:
@@ -130,31 +132,34 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                           write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                           coordinate_now=int(coordinate_now)+1
                                           write_file_index(str(coordinate_now))
+                                          #print(f"zapis {result_search}")
                                     else:
                                           result_search="Нет"
                                           write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                           coordinate_now=int(coordinate_now)+1
                                           write_file_index(str(coordinate_now))
+                                          #print(f"zapis {result_search}")
 
                               else:
-                                    print("Ищем по резервному названию")
+                                    print("*Ищем по резервному названию*")
                                     yacheika=str(reserv_column)+str(cell.row)
                                     ws = wb[sheet_name_reserv]
                                     planB=ws[yacheika]
-                                    print (yacheika)
-                                    print(planB.value)
-
+                                    
                                     if planB.value:
-                                          buf = function_search.search(driver, planB.value)
+                                          print(f"{planB.value=}")
+                                          print(f"{yacheika=}")
+                                          buf = runSearchBySite(planB.value,function_search(driver))
                                           citilink_result=""
                                           list_res=[]
+                                          
 
                                           for index, i in enumerate(buf):
                                                 if index==4:
                                                       break
                                                 
-                                                print(f"{i.get('name')} - Цена: {i.get('price')}\n")
-                                                list_res.extend([[i.get('name'),i.get('price')]])
+                                                print(f"Вывод функции поиска {i.name} - Цена: {i.price}\n")
+                                                list_res.extend([[i.name,i.price]])
                                                 
                                           #print(list_res)
                                           #print(len(list_res))
@@ -165,8 +170,9 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                                 for s in list_res:
                                                       citilink_result+=s[0]+" Цена: "+s[1]+"\n"
                                           else:
-                                                citilink_result=list_res[0][1]
-                                          print(citilink_result)
+                                                if list_res:
+                                                      citilink_result=list_res[0][1]
+                                          print(f"{citilink_result=}")     
                                           
                                           #eel.my_javascript_function(citilink_result)
                                           if citilink_result:
@@ -174,11 +180,13 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                                 write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                                 coordinate_now=int(coordinate_now)+1
                                                 write_file_index(str(coordinate_now))
+                                                #print(f"zapis {result_search}")
                                           else:
                                                 result_search="Нет"
                                                 write2_xlsx(file_put,name_sheet_write,name_write,name_col_write,result_search,coordinate_now,dlina_str)
                                                 coordinate_now=int(coordinate_now)+1
                                                 write_file_index(str(coordinate_now))
+                                                #print(f"zapis {result_search}")
                                     
 
       write_file_index("") #очищаем файл с индексом
@@ -207,14 +215,14 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,
             if cell.value==name_of_cell:
                   coordinate=cell.row
                   letter=cell.column_letter
-                  print(letter, coordinate)
+                  print(f"Проверка столбца записи = {letter} {coordinate}")
                   check=True
       nomer=int(coordinate)+1
 
       if check==True:
             #nomer2=read_file_index()
             yacheyka=letter+str(nomer2)
-            print(yacheyka)
+            print(f"Пишем в ячейку {yacheyka}")
             if list_zapis=="Нет":
                  ws[yacheyka]=list_zapis
                  megre_cell =ws[yacheyka]
@@ -224,7 +232,7 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,
                  rd.height=70
             else:
                   if dlina_str>1:
-                        print(f" Длина {dlina_str}")
+                        print(f"Длина запись {dlina_str}")
                         megre_cell =ws[yacheyka]
                         ws[yacheyka]=list_zapis
                         megre_cell.fill = PatternFill('solid', fgColor="ff9494")
@@ -232,7 +240,7 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,
                         rd = ws.row_dimensions[int(nomer2)] # get dimension for row
                         rd.height=70
                   else:
-                        print(f" Длина {dlina_str}")
+                        print(f" Длина запись {dlina_str}")
                         megre_cell =ws[yacheyka]
                         ws[yacheyka]=int(list_zapis)
                         megre_cell.fill = PatternFill('solid', fgColor="ffffff")

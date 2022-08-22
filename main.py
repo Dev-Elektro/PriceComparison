@@ -2,7 +2,7 @@ from enum import auto
 import os
 from time import sleep
 from tkinter.messagebox import YESNOCANCEL
-from searchSite import Driver, citilink, regard, dnsshop, ozon
+from searchengine import Driver, citilink, regard, dnsshop, runSearchBySite
 from web_main import website
 from cgitb import text
 
