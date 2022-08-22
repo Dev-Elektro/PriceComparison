@@ -3,11 +3,12 @@ from selenium_stealth import stealth
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
+
 class Driver():
     """Selenium драйвер с настройкой скрытия автоматизации.
     Принимает значение headless = False для отображения окна браузера."""
 
-    def __init__(self, headless = True):
+    def __init__(self, headless=True):
         self.options = Options()
         if headless:
             self.options.add_argument("--headless")
@@ -19,9 +20,10 @@ class Driver():
 
     def start(self):
         """Запуск драйвера и браузера."""
-        self.driver = webdriver.Chrome(service = self.s, options = self.options)
+        self.driver = webdriver.Chrome(service=self.s, options=self.options)
         # Активация режима скрытия автоматизации
-        stealth(self.driver,
+        stealth(
+            self.driver,
             languages=["en-US", "en"],
             vendor="Google Inc.",
             platform="Win32",
@@ -37,15 +39,3 @@ class Driver():
     def getBrowser(self):
         """Возврат объекта драйвера"""
         return self.driver
-
-def verified(txt, query):
-    """Пословестный поиск совподений в строке."""
-    queryItems = query.split(" ") # Разбивка поискового запроса на слова.
-    # Возврат True если все слова поискового запроса нашлись в тексте.
-    return sum(True for i in queryItems if i.lower() in txt.lower()) * 100 / len(queryItems)
-
-def verifiedSpec(name, spec, query):
-    """Пословестный поиск совпадений в характеристиках."""
-    # Сбор всех характеристик в одну строку
-    buf = f"{' '.join(map(lambda x: str(x.get('value')), spec))} {name}"
-    return verified(buf, query)
