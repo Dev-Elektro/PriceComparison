@@ -4,6 +4,7 @@ from openpyxl.styles import Font
 from openpyxl.utils import column_index_from_string as columnIndex
 from searchengine import SearchPool, QueryItem, runSearchBySite, Driver
 from searchengine.presetsite import dnsshop, regard  # , citilink
+from multiprocessing import cpu_count
 
 
 def printLog(name: str, total_count: int, current_pos: int):
@@ -25,7 +26,7 @@ def main():
         # Берем значение со столбца примечание, если не заполнено берем значение со столбца необходимых позиций
         query = cell_footnote.value if cell_footnote.data_type == 's' else cell.value
         search_query.append(QueryItem(rowNum=cell.row, value=query))
-    search_pool = SearchPool(processes=4, headless=False)
+    search_pool = SearchPool(processes=cpu_count(), headless=False)
     search_pool.addTask('DNS-shop', dnsshop, search_query, 'Реестр', 'K')
     search_pool.addTask('Regard', regard, search_query, 'Реестр', 'L')
     search_pool.setCallback(printLog)
@@ -73,7 +74,7 @@ def main2():
         # Берем значение со столбца примечание, если не заполнено берем значение со столбца необходимых позиций
         query = cell_footnote.value if cell_footnote.data_type == 's' else cell.value
         search_query.append(QueryItem(rowNum=cell.row, value=query))
-    search_pool = SearchPool(processes=4, headless=False)
+    search_pool = SearchPool(processes=cpu_count(), headless=False)
     search_pool.setCallback(printLog)
     search_pool.setWriteFile(writeFile)
     search_pool.addTask('DNS-shop', dnsshop, search_query, 'Реестр', 'K')
