@@ -19,7 +19,7 @@ def main():
         query = cellFootnote.value if cellFootnote.data_type == 's' else cell.value  # Берем значение со столбца примечание, если не заполнено берем значение со столбца необходимых позиций
         searchQuery.append(QueryItem(rowNum=cell.row, value=query))
     searchPool = SearchPool(processes=4, headless=False)
-    searchPool.addTask('DNS-shop', dnsshop, searchQuery, '', 'K')
+    searchPool.addTask('DNS-shop', dnsshop, searchQuery, 'Реестр', 'K')
     for searchPoolItem in searchPool:
         log.debug(f"Search finish: {searchPoolItem.name} - write to column: {searchPoolItem.columnName}")
         for resultItem in searchPoolItem.result:  # Получаем результат выполнения поиска по сайту
