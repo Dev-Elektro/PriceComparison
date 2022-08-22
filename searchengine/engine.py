@@ -1,5 +1,6 @@
 from typing import Protocol, NamedTuple, Iterable, Callable
 from multiprocessing.pool import ThreadPool
+from multiprocessing import Lock
 from searchengine.utils import findPartNumber, wordProcessing
 from searchengine.webdriver import Driver
 import re
@@ -22,7 +23,8 @@ class ResultItem(NamedTuple):
 
 
 class SearchPoolItem(NamedTuple):
-    """Объект процесса поиска. Содержит наименование сайта, наименование таблицы и столбца для записи резутатов и список результатов"""
+    """Объект процесса поиска. Содержит наименование сайта, наименование таблицы и
+    столбца для записи результатов и список результатов"""
     name: str  # Наименование сайта
     sheetName: str
     columnName: str  # Наименование колонки для записи результата
@@ -43,10 +45,12 @@ class WebSite(Protocol):
 
 class SearchPool:
     def __init__(self, processes=1, headless=True):
+        self._cbWriteFile = None
         self._pool = ThreadPool(processes=processes)
         self._processes = []
-        self.headless = headless
-        self.callback = None
+        self._headless = headless
+        self._callback = None
+        self._lock = Lock()
 
     def __iter__(self):
         self._pos = 0
@@ -65,40 +69,59 @@ class SearchPool:
         else:
             raise StopIteration
 
-    def _search(self, name: str, site: WebSite, cells: Iterable) -> list[ResultItem]:
+    def _search(self, name: str, sheet_name: str, column_name: str, site: WebSite, cells: Iterable) -> list[ResultItem]:
         """Поиск по списку с запросами из файла. Принимает функцию поиска и список запросов."""
-        driver = Driver(headless=self.headless)  # Инициализация вебдрайвера
+        driver = Driver(headless=self._headless)  # Инициализация веб драйвера
         driver.start()
-        buf = []  # Буфер для найденых результатов, что бы дублирующиеся запросы не искать повторно.
+        buf = []  # Буфер для найденных результатов, что бы дублирующиеся запросы не искать повторно.
         result = []
-        for pos, cell in enumerate(cells):  # Перебераем ячейки
-            log.debug(f"Запрос: {cell.value=}")
+        for pos, cell in enumerate(cells):  # Перебираем ячейки
+            log.debug(f"Запрос: {cell.value}")
             fromBuf = list(filter(lambda x: x[0] == cell.value, buf))  # Проверяем результат для запроса в буфере
             if not fromBuf:
                 log.debug("Запрос с сайта")
-                res = [i for i in runSearchBySite(cell.value, site(driver))]  # Вызывов функции поиска с передачей вебдрайвера и текста поискового запроса. Результат собираем в список.
+                # Поиск с передачей веб драйвера и текста поискового запроса. Результат собираем в список.
+                res = [i for i in runSearchBySite(cell.value, site(driver))]
                 buf.append([cell.value, res])
             else:
                 log.debug("Найден в буфере")
                 res = fromBuf[0][1]
-            if not isinstance(self.callback, type(None)):
-                self.callback(name, len(cells), pos + 1)
-            result.append(ResultItem(queryValue=cell.value, rowNum=cell.rowNum, listProduct=res))  # Формируем словарь с номером строки ячейки, текстом запроса и результатом поиска.
+            if not isinstance(self._callback, type(None)):
+                self._callback(name, len(cells), pos + 1)
+            # Формируем словарь с номером строки ячейки, текстом запроса и результатом поиска.
+            res_item = ResultItem(queryValue=cell.value, rowNum=cell.rowNum, listProduct=res)
+            result.append(res_item)
+            if not isinstance(self._cbWriteFile, type(None)):
+                log.debug(f"{name} - готов к записи.")
+                self._lock.acquire()
+                log.debug(f"{name} - Пишем в файл.")
+                self._cbWriteFile(name, sheet_name, column_name, res_item)
+                self._lock.release()
         driver.stop()
         return result
 
     def addTask(self, name: str, site: WebSite, listQuery: list, sheetName: str, columnName: str):
-        """Добавить задание. addTask(self, name: str, site: WebSite, listQuery: list, sheetName: str, columnName: str)"""
+        """Добавить задание. addTask(self, name: str, site: WebSite, listQuery: list, sheetName: str,
+        columnName: str)"""
         self._processes.append((
             name,
             sheetName,
             columnName,
-            self._pool.apply_async(self._search, [name, site, listQuery])
+            self._pool.apply_async(self._search, [name, sheetName, columnName, site, listQuery])
         ))
 
     def setCallback(self, func: Callable[[str, int, int], None]):
         """Обратный вызов для отображения хода процесса. Callback(siteName: str, totalCount: int, currentPos: int)"""
-        self.callback = func
+        self._callback = func
+
+    def setWriteFile(self, func: Callable[[str, str, str, ResultItem], None]):
+        """Обратный вызов для обработки найденного товара с ожиданием выполнения, передает (Имя сайта, Имя листа,
+        Имя колонки, объект ResultItem"""
+        self._cbWriteFile = func
+
+    def wait(self):
+        for p in self._processes:
+            p[3].get()
 
 
 def _searchByPartNumber(partNumber: str, site: WebSite) -> Iterable[ProductItem]:

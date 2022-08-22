@@ -4,11 +4,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
 
-class Driver():
+class Driver:
     """Selenium драйвер с настройкой скрытия автоматизации.
     Принимает значение headless = False для отображения окна браузера."""
 
-    def __init__(self, headless=True):
+    def __init__(self, headless: bool = True):
         self.options = Options()
         if headless:
             self.options.add_argument("--headless")

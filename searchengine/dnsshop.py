@@ -8,7 +8,7 @@ from searchengine.webdriver import Driver
 
 
 class dnsshop:
-    def __init__(self, driver: Driver):
+    def __init__(self, driver: Driver) -> None:
         self.browser = driver.getBrowser()
 
     def _parseProductCard(self, url: str):
