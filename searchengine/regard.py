@@ -5,6 +5,8 @@ from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
 from searchengine.engine import ProductItem
 from searchengine.webdriver import Driver
+from selenium.common.exceptions import TimeoutException
+from loguru import logger as log
 
 
 class regard:
@@ -30,28 +32,35 @@ class regard:
                 except Exception:
                     continue
             yield ProductItem(productName, productPrice, url, specifications)
-        except Exception:
+        except TimeoutException as e:
+            log.warning(e)
             return None
 
     def search(self, query: str):
         """Функция поиска по сайту"""
-        self.browser.get(f"https://www.regard.ru/catalog?search={query}")
-        currentUrl = self.browser.current_url
-        if 'search' in currentUrl or 'catalog' in currentUrl:
-            try:
-                WebDriverWait(self.browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'rendererWrapper')))
-            except Exception:
-                return None
-            grid = self.browser.find_element(By.CLASS_NAME, 'rendererWrapper')
-            soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
-            elements = soup.find_all('div', {'class': 'Card_wrap__2fsLE'})
-            for element in elements:
+        try:
+            self.browser.get(f"https://www.regard.ru/catalog?search={query}")
+            currentUrl = self.browser.current_url
+            if 'search' in currentUrl or 'catalog' in currentUrl:
                 try:
-                    productName = element.find('a', {'class': 'CardText_link__2H3AZ'}).get_text(strip=True)
-                    productPrice = element.find('span', {'class': 'CardPrice_price__1t0QB'}).get_text(strip=True).replace("\xa0", "")[:-1]
-                    link = f"https://www.regard.ru{element.find('a', {'class': 'CardText_link__2H3AZ'}).get('href')}"
+                    WebDriverWait(self.browser, timeout=5).until(
+                        ec.visibility_of_element_located((By.CLASS_NAME, 'rendererWrapper')))
                 except Exception:
-                    continue
-                yield ProductItem(productName, productPrice, f'{link}', None)
-        elif 'product' in currentUrl:
-            return self._parseProductCard(currentUrl)
+                    return None
+                grid = self.browser.find_element(By.CLASS_NAME, 'rendererWrapper')
+                soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
+                elements = soup.find_all('div', {'class': 'Card_wrap__2fsLE'})
+                for element in elements:
+                    try:
+                        productName = element.find('a', {'class': 'CardText_link__2H3AZ'}).get_text(strip=True)
+                        productPrice = element.find('span', {'class': 'CardPrice_price__1t0QB'}).get_text(
+                            strip=True).replace("\xa0", "")[:-1]
+                        link = f"https://www.regard.ru{element.find('a', {'class': 'CardText_link__2H3AZ'}).get('href')}"
+                    except Exception:
+                        continue
+                    yield ProductItem(productName, productPrice, f'{link}', None)
+            elif 'product' in currentUrl:
+                return self._parseProductCard(currentUrl)
+        except TimeoutException as e:
+            log.warning(e)
+            return None

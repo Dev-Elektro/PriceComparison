@@ -5,6 +5,8 @@ from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
 from searchengine.engine import ProductItem
 from searchengine.webdriver import Driver
+from selenium.common.exceptions import TimeoutException
+from loguru import logger as log
 
 
 class citilink:
@@ -31,29 +33,37 @@ class citilink:
                 except Exception:
                     continue
             yield ProductItem(productName, productPrice, url, specifications)
-        except Exception:
+        except TimeoutException as e:
+            log.warning(e)
             return None
 
     def search(self, query):
         """Функция поиска по сайту"""
-        self.browser.get(f"https://www.citilink.ru/search/?text={query}")
-        currentUrl = self.browser.current_url
-        if 'search' in currentUrl:
-            try:
-                WebDriverWait(self.browser, timeout=5).until(ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
-            except Exception:
-                return None
-
-            grid = self.browser.find_element(By.CLASS_NAME, 'ProductCardCategoryList__grid')
-            soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
-            elements = soup.find_all('div', {'class': 'ProductCardVertical'})
-            for element in elements:
+        try:
+            self.browser.get(f"https://www.citilink.ru/search/?text={query}")
+            currentUrl = self.browser.current_url
+            if 'search' in currentUrl:
                 try:
-                    productName = element.find('a', {'class': 'ProductCardVertical__name'}).get('title')
-                    productPrice = element.find('span', {'class': 'ProductCardVerticalPrice__price-current_current-price'}).get_text(strip=True).replace(" ", "")
-                    link = f"https://www.citilink.ru{element.find('a', {'class': 'ProductCardVertical__name'}).get('href')}"
+                    WebDriverWait(self.browser, timeout=5).until(
+                        ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
                 except Exception:
-                    continue
-                yield ProductItem(productName, productPrice, f'{link}', None)
-        elif 'product' in currentUrl:
-            return self._parseProductCard(currentUrl)
+                    return None
+
+                grid = self.browser.find_element(By.CLASS_NAME, 'ProductCardCategoryList__grid')
+                soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
+                elements = soup.find_all('div', {'class': 'ProductCardVertical'})
+                for element in elements:
+                    try:
+                        productName = element.find('a', {'class': 'ProductCardVertical__name'}).get('title')
+                        productPrice = element.find('span', {
+                            'class': 'ProductCardVerticalPrice__price-current_current-price'}).get_text(
+                            strip=True).replace(" ", "")
+                        link = f"https://www.citilink.ru{element.find('a', {'class': 'ProductCardVertical__name'}).get('href')}"
+                    except Exception:
+                        continue
+                    yield ProductItem(productName, productPrice, f'{link}', None)
+            elif 'product' in currentUrl:
+                return self._parseProductCard(currentUrl)
+        except TimeoutException as e:
+            log.warning(e)
+            return None
