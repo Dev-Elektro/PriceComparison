@@ -2,7 +2,7 @@ from loguru import logger as log
 from openpyxl import load_workbook
 from openpyxl.styles import Font
 from openpyxl.utils import column_index_from_string as columnIndex
-from searchengine import SearchPool, QueryItem, runSearchBySite, Driver, writeToFile
+from searchengine import SearchPool, QueryItem, runSearchBySite, writeToFile
 from searchengine.presetsite import dnsshop, regard, citilink
 from multiprocessing import cpu_count
 from web_main import website

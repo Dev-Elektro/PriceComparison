@@ -5,7 +5,8 @@ import os
 from time import sleep
 from tkinter.messagebox import YESNOCANCEL
 from searchengine.presetsite import citilink, regard, dnsshop
-from searchengine import Driver, runSearchBySite
+from searchengine.webdriver import Driver
+from searchengine import runSearchBySite
 from cgitb import text
 from tkinter import filedialog
 from tkinter import *
@@ -16,7 +17,6 @@ import pandas as pd
 import openpyxl
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Alignment
-import traceback
 import eel
 from random import randint
 import shutil
