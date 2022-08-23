@@ -5,6 +5,7 @@ from openpyxl.utils import column_index_from_string as columnIndex
 from searchengine import SearchPool, QueryItem, runSearchBySite, Driver, writeToFile
 from searchengine.presetsite import dnsshop, regard, citilink
 from multiprocessing import cpu_count
+from web_main import website
 
 
 def printLog(name: str, total_count: int, current_pos: int):
@@ -104,5 +105,6 @@ def main2():
 if __name__ == '__main__':
     from datetime import datetime
     start = datetime.now()
-    main2()
+    #main2()
+    website("one")
     log.warning(f"Обработано за: {datetime.now() - start}")
