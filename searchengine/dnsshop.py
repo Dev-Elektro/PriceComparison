@@ -8,6 +8,7 @@ from searchengine.webdriver import Driver
 
 
 class dnsshop:
+    """Парсер для сайта dns-shop.ru"""
     def __init__(self, driver: Driver) -> None:
         self.browser = driver.getBrowser()
 

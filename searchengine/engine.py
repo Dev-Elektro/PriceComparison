@@ -43,9 +43,21 @@ class WebSite(Protocol):
         raise NotImplementedError
 
 
+_file_to_write: Callable = None
+
+
+def writeToFile(func: Callable) -> Callable:
+    """Декоратор для указания файла для записи"""
+    global _file_to_write
+    _file_to_write = func
+    return func
+
+
 class SearchPool:
+    global _file_to_write
+
     def __init__(self, processes=1, headless=True):
-        self._cbWriteFile = None
+        self._cbWriteFile = _file_to_write
         self._pool = ThreadPool(processes=processes)
         self._processes = []
         self._headless = headless
@@ -120,27 +132,28 @@ class SearchPool:
         self._cbWriteFile = func
 
     def wait(self):
+        """Ожидание завершения работы потоков."""
         for p in self._processes:
             p[3].get()
 
 
-def _searchByPartNumber(partNumber: str, site: WebSite) -> Iterable[ProductItem]:
+def _searchByPartNumber(part_number: str, site: WebSite) -> Iterable[ProductItem]:
     """Поиск по парт номеру"""
-    for item in site.search(partNumber):  # Получаем поисковый ответ от сайта
+    for item in site.search(part_number):  # Получаем поисковый ответ от сайта
         buf = item.name
         if spec := item.specifications:  # Если в результате поиска есть спецификации, то их собираем в строку
             buf += f"{' '.join(map(lambda x: str(x.get('value')), spec))}"
-        if partNumber in buf:  # Проверка совпадает ли парт номер с результатом поиска
+        if part_number in buf:  # Проверка совпадает ли парт номер с результатом поиска
             yield item
 
 
 def _searchByText(query: str, site: WebSite) -> Iterable[ProductItem]:
     """Поиск по тексту"""
     for query_proc in wordProcessing(query):
-        emptyData = True
-        interationStop = False
+        empty_data = True
+        interation_stop = False
         for item in site.search(query_proc):
-            emptyData = False
+            empty_data = False
             regex = r"[\w-]{3,}"
             buf = item.name
             if spec := item.specifications:
@@ -149,9 +162,9 @@ def _searchByText(query: str, site: WebSite) -> Iterable[ProductItem]:
             result_word = re.findall(regex, buf.lower(), re.MULTILINE | re.UNICODE)
             overlap = sum(True for word in query_word if word in result_word)
             if overlap == len(query_word):
-                interationStop = True
+                interation_stop = True
                 yield item
-        if emptyData or interationStop:
+        if empty_data or interation_stop:
             return
 
 
