@@ -103,9 +103,8 @@ def main2():
 
 
 if __name__ == '__main__':
-    from datetime import datetime
-    start = datetime.now()
-    main2()
-    #website("reestr")
-    #website("one")
-    log.warning(f"Обработано за: {datetime.now() - start}")
+    import sys
+    if len(sys.argv) == 1:
+        website("one")
+    elif sys.argv[1] == 'registry':
+        website("reestr")
