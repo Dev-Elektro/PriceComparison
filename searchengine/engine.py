@@ -70,12 +70,15 @@ class SearchPool:
 
     def __next__(self):
         if self._pos < len(self._processes):
-            res = SearchPoolItem(
-                self._processes[self._pos][0],
-                self._processes[self._pos][1],
-                self._processes[self._pos][2],
-                self._processes[self._pos][3].get()
-            )
+            try:
+                res = SearchPoolItem(
+                    self._processes[self._pos][0],
+                    self._processes[self._pos][1],
+                    self._processes[self._pos][2],
+                    self._processes[self._pos][3].get()
+                )
+            except Exception as e:
+                log.exception(e)
             self._pos += 1
             return res
         else:

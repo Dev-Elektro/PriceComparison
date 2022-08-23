@@ -3,7 +3,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font
 from openpyxl.utils import column_index_from_string as columnIndex
 from searchengine import SearchPool, QueryItem, runSearchBySite, Driver, writeToFile
-from searchengine.presetsite import dnsshop, regard  # , citilink
+from searchengine.presetsite import dnsshop, regard, citilink
 from multiprocessing import cpu_count
 
 
@@ -19,6 +19,7 @@ def main():
     cells = list(filter(lambda x: x.data_type == 's', sheet['D'][6:]))
     search_query_dns = []
     search_query_regard = []
+    search_query_citilink = []
     for cell in cells:  # Бежим по столбцу необходимых позиций
         # Получаем ячейку примечание с текущей строки
         cell_footnote = file['Запрос КП1'].cell(row=cell.row, column=columnIndex('H'))
@@ -30,10 +31,14 @@ def main():
         # Проверяем требуется запрос для regard
         if checkForWaitQuery(sheet, cell.row, 'L'):
             search_query_regard.append(QueryItem(rowNum=cell.row, value=query))
+        # Проверяем требуется запрос для regard
+        if checkForWaitQuery(sheet, cell.row, 'M'):
+            search_query_citilink.append(QueryItem(rowNum=cell.row, value=query))
     search_pool = SearchPool(processes=cpu_count(), headless=False)
     search_pool.setCallback(printLog)
     search_pool.addTask('DNS-shop', dnsshop, search_query_dns, 'Реестр', 'K')
     search_pool.addTask('Regard', regard, search_query_regard, 'Реестр', 'L')
+    search_pool.addTask('Citilink', citilink, search_query_citilink, 'Реестр', 'M')
     search_pool.setCallback(printLog)
     for searchPoolItem in search_pool:
         log.info(f"Search finish: {searchPoolItem.name} - write to column: {searchPoolItem.columnName}")
@@ -97,4 +102,7 @@ def main2():
 
 
 if __name__ == '__main__':
+    from datetime import datetime
+    start = datetime.now()
     main2()
+    log.warning(f"Обработано за: {datetime.now() - start}")
