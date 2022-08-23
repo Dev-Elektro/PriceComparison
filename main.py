@@ -105,6 +105,7 @@ def main2():
 if __name__ == '__main__':
     from datetime import datetime
     start = datetime.now()
-    #main2()
-    website("one")
+    main2()
+    #website("reestr")
+    #website("one")
     log.warning(f"Обработано за: {datetime.now() - start}")
