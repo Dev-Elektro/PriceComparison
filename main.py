@@ -7,7 +7,6 @@ from web_main import website
 from cgitb import text
 
 
-
 #s = input("Поиск: ")
 
 #website("reestr")
@@ -40,5 +39,4 @@ for i in buf:
     print(f"{i.get('name')} - Цена: {i.get('price')}\n")
 """
 #input("\nНажми Enter для завершения...")
-
 quit()
