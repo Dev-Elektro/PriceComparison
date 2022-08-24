@@ -8,7 +8,7 @@ from loguru import logger as log
 
 
 class ProductItem(NamedTuple):
-    """Объект товара. Содержин наименование, цену, адрес в каталоге магазина, характеристики"""
+    """Объект товара. Содержит наименование, цену, адрес в каталоге магазина, характеристики"""
     name: str
     price: str
     url: str
@@ -16,10 +16,10 @@ class ProductItem(NamedTuple):
 
 
 class ResultItem(NamedTuple):
-    """Объект результата поска. Содержит наименование запроса, номер стороки в таблице и спикок найденых товаров"""
+    """Объект результата поиска. Содержит наименование запроса, номер строки в таблице и список найденных товаров"""
     queryValue: str  # Текст запроса
     rowNum: int  # Номер строки в таблице
-    listProduct: list[ProductItem]  # Список найденых товаров
+    listProduct: list[ProductItem]  # Список найденных товаров
 
 
 class SearchPoolItem(NamedTuple):
@@ -38,7 +38,7 @@ class QueryItem(NamedTuple):
 
 
 class WebSite(Protocol):
-    """Интерфейс для послучения дынных со страницы поиска на сайтах"""
+    """Интерфейс для получения дынных со страницы поиска на сайтах"""
     def search(self, query: str) -> Iterable[ProductItem]:
         raise NotImplementedError
 
@@ -70,6 +70,7 @@ class SearchPool:
 
     def __next__(self):
         if self._pos < len(self._processes):
+            res = None
             try:
                 res = SearchPoolItem(
                     self._processes[self._pos][0],
@@ -92,15 +93,15 @@ class SearchPool:
         result = []
         for pos, cell in enumerate(cells):  # Перебираем ячейки
             log.debug(f"Запрос: {cell.value}")
-            fromBuf = list(filter(lambda x: x[0] == cell.value, buf))  # Проверяем результат для запроса в буфере
-            if not fromBuf:
+            from_buf = list(filter(lambda x: x[0] == cell.value, buf))  # Проверяем результат для запроса в буфере
+            if not from_buf:
                 log.debug("Запрос с сайта")
                 # Поиск с передачей веб драйвера и текста поискового запроса. Результат собираем в список.
                 res = [i for i in runSearchBySite(cell.value, site(driver))]
                 buf.append([cell.value, res])
             else:
                 log.debug("Найден в буфере")
-                res = fromBuf[0][1]
+                res = from_buf[0][1]
             if not isinstance(self._callback, type(None)):
                 self._callback(name, len(cells), pos + 1)
             # Формируем словарь с номером строки ячейки, текстом запроса и результатом поиска.
@@ -115,14 +116,14 @@ class SearchPool:
         driver.stop()
         return result
 
-    def addTask(self, name: str, site: WebSite, listQuery: list, sheetName: str, columnName: str):
+    def addTask(self, name: str, site: WebSite, list_query: list, sheet_name: str, column_name: str):
         """Добавить задание. addTask(self, name: str, site: WebSite, listQuery: list, sheetName: str,
         columnName: str)"""
         self._processes.append((
             name,
-            sheetName,
-            columnName,
-            self._pool.apply_async(self._search, [name, sheetName, columnName, site, listQuery])
+            sheet_name,
+            column_name,
+            self._pool.apply_async(self._search, [name, sheet_name, column_name, site, list_query])
         ))
 
     def setCallback(self, func: Callable[[str, int, int], None]):

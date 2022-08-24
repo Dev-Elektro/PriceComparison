@@ -3,6 +3,7 @@ index_0.txt
 chrome-win
 output
 chromedriver.exe
+.idea/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -18,20 +18,20 @@ class regard:
         try:
             self.browser.get(url)
             WebDriverWait(self.browser, timeout=5).until(ec.visibility_of_element_located((By.TAG_NAME, 'main')))
-            contentHtml = self.browser.find_element(By.TAG_NAME, 'main').get_attribute('innerHTML')
-            contentHtml = BeautifulSoup(contentHtml, 'lxml')
-            productName = contentHtml.find('h1', {'class': 'productPage_title__1B1Yw'}).get_text(strip=True)
-            productPrice = contentHtml.find('span', {'class': 'PriceBlock_price__3hwFe'}).get_text(strip=True).replace('\xa0', '')[:-1]
-            specificationsHtml = contentHtml.find('div', {'class': 'Grid_row__ZvFHa productPage_bottom__2rdYu'}).find_all('li', {'class': 'CharacteristicsItem_li__hJ4YF'})
+            content_html = self.browser.find_element(By.TAG_NAME, 'main').get_attribute('innerHTML')
+            content_html = BeautifulSoup(content_html, 'lxml')
+            product_name = content_html.find('h1', {'class': 'productPage_title__1B1Yw'}).get_text(strip=True)
+            product_price = content_html.find('span', {'class': 'PriceBlock_price__3hwFe'}).get_text(strip=True).replace('\xa0', '')[:-1]
+            specifications_html = content_html.find('div', {'class': 'Grid_row__ZvFHa productPage_bottom__2rdYu'}).find_all('li', {'class': 'CharacteristicsItem_li__hJ4YF'})
             specifications = []
-            for item in specificationsHtml:
+            for item in specifications_html:
                 try:
                     name = item.find('div', {'class': 'CharacteristicsItem_name__-AhRC'}).find('span').get_text(strip=True)
                     value = item.find('p', {'class': 'CharacteristicsItem_value__3-EWJ'}).find('span').get_text(strip=True)
                     specifications.append({'name': name, 'value': value})
                 except Exception:
                     continue
-            yield ProductItem(productName, productPrice, url, specifications)
+            yield ProductItem(product_name, product_price, url, specifications)
         except TimeoutException as e:
             log.warning(e)
             return None
