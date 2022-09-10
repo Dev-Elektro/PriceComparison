@@ -21,7 +21,7 @@ import eel
 from random import randint
 import shutil
 
-driver = Driver(headless = False)
+driver = Driver(headless = True)
 
 def write_file_index(index):
       f = open('index.txt','w')
@@ -49,7 +49,7 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
       eel.js_wait()
       name_of_magaz=function_search.__name__
       name_of_magaz=name_of_magaz.replace("searchSite.","")
-      eel.my_javascript_function(f"• Запустили поиск по магазину {name_of_magaz}")
+      eel.my_javascript_function(f"• Запустили поиск по магазину {name_of_magaz} по листу {sheet_name}")
       check=False
       if not os.path.exists("index.txt"):
         open("index.txt", 'w').close()
@@ -199,13 +199,13 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
       write_file_index("") #очищаем файл с индексом
       write_file_index_nach("") #очищаем файл с начальным индексом
       print(f" Выполнен поиск по магазину {name_of_magaz}")
-      eel.my_javascript_function(f"✓ Завершен поиск по магазину {name_of_magaz}")
+      eel.my_javascript_function("<font color=\"green\">"+f"✓ Завершен поиск по магазину {name_of_magaz} по листу {sheet_name}"+"</font>")
       eel.js_gotovo()
       driver.stop()
       
 
 
-#(путь к файлу, имя листа, буква основной колонки, имя столбца основного, данные для записи, номер ячейки)
+#(путь к файлу, имя листа, буква основной колонки, имя столбца основного, данные для записи, номер ячейки, длина)
 def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,dlina_str):
       """Функция записи в файл реестра (поиск по реестру)"""
       check=False
@@ -218,6 +218,12 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,
       wb = load_workbook(xlsx)
       ws = wb[sheet_name]
       column=ws[column_number]
+      ws["I6"]="Ситилинк"
+      ws["J6"]="Регард"
+      ws["K6"]="ДНС"
+      for col in ['I', 'J', 'K']:
+            if ws.column_dimensions[col].hidden == False:
+                  ws.column_dimensions[col].hidden= True
 
       for cell in column:
             if cell.value==name_of_cell:
@@ -225,7 +231,7 @@ def write2_xlsx(xlsx, sheet_name, column_number, name_of_cell,list_zapis,nomer2,
                   letter=cell.column_letter
                   print(f"Проверка столбца записи = {letter} {coordinate}")
                   check=True
-      nomer=int(coordinate)+1
+      #nomer=int(coordinate)+1
 
       if check==True:
             #nomer2=read_file_index()
@@ -386,13 +392,15 @@ def start_search_js():
             ch_citilink=eel.check_citilink()()
             ch_regard=eel.check_regard()()
             ch_dns=eel.check_dns()()
-            if ch_citilink == "citilink":
-#(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, буква столбца записи, имя столбца записи)
-                  read2_xlsx(file_put,"Запрос КП4","Реестр","h","d","Примечание","Наименование необходимых позиций",citilink,"Запрос КП4","e","Цена за 1шт")
-            if ch_regard == "regard":
-                  read2_xlsx(file_put,"Запрос КП5","Реестр","h","d","Примечание","Наименование необходимых позиций",regard,"Запрос КП5","e","Цена за 1шт")
-            if ch_dns == "dns":
-                  read2_xlsx(file_put,"Запрос КП6","Реестр","h","d","Примечание","Наименование необходимых позиций",dnsshop,"Запрос КП6","e","Цена за 1шт")
+            list_all_search=["Запрос КП1","Запрос КП2","Запрос КП3","Запрос КП4","Запрос КП5","Запрос КП6","Запрос КП7","Запрос КП8"]
+            for lname in list_all_search:
+                  if ch_citilink == "citilink":
+                  #(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, буква столбца записи, имя столбца записи)
+                        read2_xlsx(file_put,lname,"Реестр","h","d","Примечание","Наименование необходимых позиций",citilink,lname,"i","Ситилинк")
+                  if ch_regard == "regard":
+                        read2_xlsx(file_put,lname,"Реестр","h","d","Примечание","Наименование необходимых позиций",regard,lname,"j","Регард")
+                  if ch_dns == "dns":
+                        read2_xlsx(file_put,lname,"Реестр","h","d","Примечание","Наименование необходимых позиций",dnsshop,lname,"k","ДНС")
       
 
 #поиск по одному
