@@ -11,6 +11,7 @@ from loguru import logger as log
 
 class regard:
     def __init__(self, driver: Driver):
+        self.name = "Regard"
         self.browser = driver.getBrowser()
 
     def _parseProductCard(self, url: str):

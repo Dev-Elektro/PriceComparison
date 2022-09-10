@@ -12,6 +12,7 @@ from loguru import logger as log
 class dnsshop:
     """Парсер для сайта dns-shop.ru"""
     def __init__(self, driver: Driver) -> None:
+        self.name = "DNS-Shop"
         self.browser = driver.getBrowser()
 
     def _parseProductCard(self, url: str):

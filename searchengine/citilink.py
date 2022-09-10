@@ -11,6 +11,7 @@ from loguru import logger as log
 
 class citilink:
     def __init__(self, driver: Driver):
+        self.name = "Citilink"
         self.browser = driver.getBrowser()
 
     def _parseProductCard(self, url: str):

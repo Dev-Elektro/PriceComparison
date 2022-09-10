@@ -1,7 +1,10 @@
+import os
 from selenium import webdriver
 from selenium_stealth import stealth
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+import sys
+from subprocess import CREATE_NO_WINDOW
 
 
 class Driver:
@@ -9,14 +12,20 @@ class Driver:
     Принимает значение headless = False для отображения окна браузера."""
 
     def __init__(self, headless: bool = True):
+        self.driver = None
         self.options = Options()
         if headless:
             self.options.add_argument("--headless")
         self.options.add_argument("start-maximized")
         self.options.add_experimental_option("excludeSwitches", ["enable-logging", "enable-automation"])
         self.options.add_experimental_option('useAutomationExtension', False)
-        self.options.binary_location = "chrome-win/chrome.exe"
+        path = os.path.abspath(os.getcwd())
+        if getattr(sys, 'frozen', False):
+            path = sys._MEIPASS
+        path = os.path.join(path, "chrome-win/chrome.exe")
+        self.options.binary_location = path
         self.s = Service('chromedriver.exe')
+        self.s.creationflags = CREATE_NO_WINDOW
 
     def start(self):
         """Запуск драйвера и браузера."""
