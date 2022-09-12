@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from typing import Iterable
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
@@ -37,12 +38,24 @@ class regard:
             log.warning(e)
             return None
 
+    @staticmethod
+    def _parseProductList(elements: list) -> Iterable[ProductItem]:
+        for element in elements:
+            try:
+                product_name = element.find('a', {'class': 'CardText_link__2H3AZ'}).get_text(strip=True)
+                product_price = element.find('span', {'class': 'CardPrice_price__1t0QB'}).get_text(
+                    strip=True).replace("\xa0", "")[:-1]
+                link = f"https://www.regard.ru{element.find('a', {'class': 'CardText_link__2H3AZ'}).get('href')}"
+            except Exception:
+                continue
+            yield ProductItem(product_name, product_price, f'{link}', None)
+
     def search(self, query: str):
         """Функция поиска по сайту"""
         try:
             self.browser.get(f"https://www.regard.ru/catalog?search={query}")
-            currentUrl = self.browser.current_url
-            if 'search' in currentUrl or 'catalog' in currentUrl:
+            current_url = self.browser.current_url
+            if 'search' in current_url or 'catalog' in current_url:
                 try:
                     WebDriverWait(self.browser, timeout=5).until(
                         ec.visibility_of_element_located((By.CLASS_NAME, 'rendererWrapper')))
@@ -51,17 +64,12 @@ class regard:
                 grid = self.browser.find_element(By.CLASS_NAME, 'rendererWrapper')
                 soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
                 elements = soup.find_all('div', {'class': 'Card_wrap__2fsLE'})
-                for element in elements:
-                    try:
-                        productName = element.find('a', {'class': 'CardText_link__2H3AZ'}).get_text(strip=True)
-                        productPrice = element.find('span', {'class': 'CardPrice_price__1t0QB'}).get_text(
-                            strip=True).replace("\xa0", "")[:-1]
-                        link = f"https://www.regard.ru{element.find('a', {'class': 'CardText_link__2H3AZ'}).get('href')}"
-                    except Exception:
-                        continue
-                    yield ProductItem(productName, productPrice, f'{link}', None)
-            elif 'product' in currentUrl:
-                return self._parseProductCard(currentUrl)
+                log.debug("Parse product list")
+                return self._parseProductList(elements)
+
+            elif 'product' in current_url:
+                log.debug("Parse product card")
+                return self._parseProductCard(current_url)
         except TimeoutException as e:
             log.warning(e)
             return None
