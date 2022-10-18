@@ -21,7 +21,7 @@ import eel
 from random import randint
 import shutil
 
-driver = Driver(headless = True)
+driver = Driver(headless = False)
 
 def write_file_index(index):
       f = open('index.txt','w')
@@ -392,7 +392,8 @@ def start_search_js():
             ch_citilink=eel.check_citilink()()
             ch_regard=eel.check_regard()()
             ch_dns=eel.check_dns()()
-            list_all_search=["Запрос КП1","Запрос КП2","Запрос КП3","Запрос КП4","Запрос КП5","Запрос КП6","Запрос КП7","Запрос КП8"]
+            #list_all_search=["Запрос КП1","Запрос КП2","Запрос КП3","Запрос КП4","Запрос КП5","Запрос КП6","Запрос КП7","Запрос КП8"]
+            list_all_search=["Запрос КП1"]
             for lname in list_all_search:
                   if ch_citilink == "citilink":
                   #(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, буква столбца записи, имя столбца записи)
