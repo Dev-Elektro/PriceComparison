@@ -103,7 +103,7 @@ def main2():
     search_pool.wait()
 
 
-if __name__ == '__main2__':
+if __name__ == '__main__':
     import sys
     if len(sys.argv) == 1:
         website("one")
