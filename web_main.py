@@ -39,6 +39,18 @@ def read_file_index():
       f.close()
       return rindex
 
+def write_file_index_kp(index):
+      f = open('index_kp.txt','w') 
+      for  line in index:
+            f.write(line + '\n')
+      f.close()
+
+def read_file_index_kp():
+      f = open('index_kp.txt','r')
+      rindex = [line.rstrip('\n') for line in f]
+      f.close()
+      return rindex
+
 
 
 #(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного, имя резервного стобца, имя функции поиска цены, буква столбца записи, имя столбца записи)
@@ -70,8 +82,12 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                   coordinatenachcalo=cell.row
                   print(f"{coordinatenachcalo=}")
                   write_file_index_nach(str(coordinatenachcalo))
-                  coordinate_now=int(coordinatenachcalo)+1
-                  write_file_index(str(coordinate_now))
+                  coordinate_index_from_file=read_file_index()
+                  if coordinate_index_from_file:
+                        coordinate_now=coordinate_index_from_file
+                  else:
+                        coordinate_now=int(coordinatenachcalo)+1
+                        write_file_index(str(coordinate_now))
       dlina=0
       dlina_str=0
       for i in column:
@@ -391,9 +407,20 @@ def start_search_js():
             ch_citilink=eel.check_citilink()()
             ch_regard=eel.check_regard()()
             ch_dns=eel.check_dns()()
-            #list_all_search=["Запрос КП1","Запрос КП2","Запрос КП3","Запрос КП4","Запрос КП5","Запрос КП6","Запрос КП7","Запрос КП8"]
-            list_all_search=["Запрос КП1"]
-            for lname in list_all_search:
+            if not os.path.exists("index_kp.txt"):
+                  open("index_kp.txt", 'w').close()
+            
+            index_kp=read_file_index_kp() 
+            if index_kp:
+                  list_all_search=index_kp
+            else:
+                  #list_all_search=["Запрос КП1","Запрос КП2","Запрос КП3","Запрос КП4","Запрос КП5","Запрос КП6","Запрос КП7","Запрос КП8"]
+                  list_all_search=["Запрос КП1"]
+
+            for lname in list(list_all_search):
+                  print(lname)
+                  list_all_search.remove(lname)
+                  write_file_index_kp(list_all_search)
                   if ch_citilink == "citilink":
                   #(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, буква столбца записи, имя столбца записи)
                         read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",citilink,lname,"i","Ситилинк")
