@@ -75,7 +75,7 @@ class dnsshop:
                     WebDriverWait(self.browser, timeout=5).until(
                         ec.visibility_of_element_located((By.CLASS_NAME, 'order-avail-wrap')))
                 except Exception:
-                    return None
+                    return []
 
                 grid = self.browser.find_element(By.CLASS_NAME, 'products-list')
                 soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
@@ -88,4 +88,6 @@ class dnsshop:
                 return self._parseProductCard(current_url)
         except TimeoutException as e:
             log.warning(e)
-            return None
+            return []
+
+        return []

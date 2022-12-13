@@ -67,13 +67,16 @@ class citilink:
                 try:
                     WebDriverWait(self.browser, timeout=5).until(
                         ec.visibility_of_element_located((By.CLASS_NAME, 'ProductCardCategoryList__grid')))
-                except Exception:
-                    return None
+                except Exception as e:
+                    print(e)
+                    log.debug(f"Oshibka poisk SITILINK {e}")
+                    return []
 
                 grid = self.browser.find_element(By.CLASS_NAME, 'ProductCardCategoryList__grid')
                 soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
                 elements = soup.find_all('div', {'class': 'ProductCardVertical'})
                 log.debug("Parse product list")
+
                 return self._parseProductList(elements)
 
             elif 'product' in current_url:
@@ -81,4 +84,5 @@ class citilink:
                 return self._parseProductCard(current_url)
         except TimeoutException as e:
             log.warning(e)
-            return None
+            return []
+        return []

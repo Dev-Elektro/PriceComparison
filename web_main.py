@@ -113,7 +113,6 @@ def read2_xlsx(xlsx, sheet_name,sheet_name_reserv, column_number,reserv_column, 
                                     buf = runSearchBySite(plan_main.value,function_search(driver))
                                     citilink_result=""
                                     list_res=[]
-                                    
                                     for index, i in enumerate(buf):
                                           if index==4:
                                                 break
@@ -397,11 +396,11 @@ def start_search_js():
             for lname in list_all_search:
                   if ch_citilink == "citilink":
                   #(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, буква столбца записи, имя столбца записи)
-                        read2_xlsx(file_put,lname,"Реестр","h","d","Примечание","Наименование необходимых позиций",citilink,lname,"i","Ситилинк")
+                        read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",citilink,lname,"i","Ситилинк")
                   if ch_regard == "regard":
-                        read2_xlsx(file_put,lname,"Реестр","h","d","Примечание","Наименование необходимых позиций",regard,lname,"j","Регард")
+                        read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",regard,lname,"j","Регард")
                   if ch_dns == "dns":
-                        read2_xlsx(file_put,lname,"Реестр","h","d","Примечание","Наименование необходимых позиций",dnsshop,lname,"k","ДНС")
+                        read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",dnsshop,lname,"k","ДНС")
       
 
 #поиск по одному
