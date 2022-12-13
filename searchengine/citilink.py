@@ -4,13 +4,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
+
+from searchengine import WebSite
 from searchengine.engine import ProductItem
 from searchengine.webdriver import Driver
 from selenium.common.exceptions import TimeoutException
 from loguru import logger as log
 
 
-class citilink:
+class citilink(WebSite):
     def __init__(self, driver: Driver):
         self.name = "Citilink"
         self.browser = driver.getBrowser()
@@ -25,7 +27,7 @@ class citilink:
             content_html = self.browser.find_element(By.ID, 'content').get_attribute('innerHTML')
             content_html = BeautifulSoup(content_html, 'lxml')
             if "Нет в наличии" in str(content_html):
-                return None
+                return []
             product_name = content_html.select_one('div.Container > div > div > div h1').get_text(strip=True)
             product_price = content_html.select_one(
                 'div.Container > div > div > div:nth-child(5) > section:nth-child(3) span > span'
@@ -43,7 +45,7 @@ class citilink:
             yield ProductItem(product_name, product_price, url, specifications)
         except TimeoutException as e:
             log.warning(e)
-            return None
+            return []
 
     @staticmethod
     def _parseProductList(elements: list) -> Iterable[ProductItem]:

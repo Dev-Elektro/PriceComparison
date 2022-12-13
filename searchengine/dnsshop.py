@@ -4,14 +4,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
+
+from searchengine import WebSite
 from searchengine.engine import ProductItem
 from searchengine.webdriver import Driver
 from selenium.common.exceptions import TimeoutException
 from loguru import logger as log
 
 
-class dnsshop:
+class dnsshop(WebSite):
     """Парсер для сайта dns-shop.ru"""
+    name = "DNS"
+
     def __init__(self, driver: Driver) -> None:
         self.name = "DNS-Shop"
         self.browser = driver.getBrowser()
@@ -26,7 +30,7 @@ class dnsshop:
             content_html = self.browser.find_element(By.CSS_SELECTOR, '.container.product-card').get_attribute('innerHTML')
             content_html = BeautifulSoup(content_html, 'lxml')
             if content_html.find('div', {'class': 'order-avail-wrap order-avail-wrap_not-avail'}):
-                return None
+                return []
             product_name = content_html.find('h1', {'class': 'product-card-top__title'}).get_text(strip=True).replace('Характеристики ', '')
             product_price = content_html.find('div', {'class': 'product-buy__price'}).get_text(strip=True).replace(' ', '')[:-1]
             specifications_html = content_html.find('div', {'class': 'product-card-description'}).find_all('div', {'class': 'product-characteristics__spec'})
@@ -43,7 +47,7 @@ class dnsshop:
             yield ProductItem(product_name, product_price, url, specifications)
         except TimeoutException as e:
             log.warning(e)
-            return None
+            return []
 
     @staticmethod
     def _parseProductList(elements: list) -> Iterable[ProductItem]:
@@ -61,7 +65,7 @@ class dnsshop:
                 continue
             yield ProductItem(product_name, product_price, f'{link}', None)
 
-    def search(self, query: str):
+    def search(self, query: str) -> Iterable[ProductItem]:
         """Поиск по сайту и парсинг результата"""
         try:
             self.browser.get(f"https://www.dns-shop.ru/search/?q={query}")

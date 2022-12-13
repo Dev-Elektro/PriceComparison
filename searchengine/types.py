@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import NamedTuple, Protocol, Iterable
 
 
@@ -33,7 +34,8 @@ class QueryItem(NamedTuple):
 
 class WebSite(Protocol):
     """Интерфейс для получения дынных со страницы поиска на сайтах"""
-    name = None
+    name: str
 
+    @abstractmethod
     def search(self, query: str) -> Iterable[ProductItem]:
         raise NotImplementedError

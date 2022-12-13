@@ -32,7 +32,7 @@ def parseProductCard(browser, url):
             'specifications': specifications,
         }
     except Exception as e:
-        return None
+        return []
     return res
 
 def search(driver, query):
@@ -45,7 +45,7 @@ def search(driver, query):
         try:
             WebDriverWait(browser, timeout=5).until(ec.visibility_of_element_located((By.CSS_SELECTOR, '.widget-search-result-container')))
         except Exception as e:
-            return None
+            return []
         grid = browser.find_element(By.CSS_SELECTOR, '.widget-search-result-container')
         soup = BeautifulSoup(grid.get_attribute('innerHTML'), 'lxml')
         elements = soup.find('div').find_all('div', recursive = False)

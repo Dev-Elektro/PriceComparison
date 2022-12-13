@@ -4,13 +4,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from bs4 import BeautifulSoup
+
+from searchengine import WebSite
 from searchengine.engine import ProductItem
 from searchengine.webdriver import Driver
 from selenium.common.exceptions import TimeoutException
 from loguru import logger as log
 
 
-class regard:
+class regard(WebSite):
     def __init__(self, driver: Driver):
         self.name = "Regard"
         self.browser = driver.getBrowser()
@@ -36,7 +38,7 @@ class regard:
             yield ProductItem(product_name, product_price, url, specifications)
         except TimeoutException as e:
             log.warning(e)
-            return None
+            return []
 
     @staticmethod
     def _parseProductList(elements: list) -> Iterable[ProductItem]:
