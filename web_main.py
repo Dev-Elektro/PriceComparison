@@ -414,25 +414,19 @@ def start_search_js():
             if index_kp:
                   list_all_search=index_kp
             else:
-                  #list_all_search=["Запрос КП1","Запрос КП2","Запрос КП3","Запрос КП4","Запрос КП5","Запрос КП6","Запрос КП7","Запрос КП8"]
-                  list_all_search=["Запрос КП1"]
+                  list_all_search=["Запрос КП1","Запрос КП2","Запрос КП3","Запрос КП4","Запрос КП5","Запрос КП6","Запрос КП7","Запрос КП8"]
+                  #list_all_search=["Запрос КП1"]
 
-            for lname in list(list_all_search):
-                                    
+            for lname in list(list_all_search):                                    
                   if ch_citilink == "citilink":
                   #(путь к файлу, имя листа, имя  резервного листа, буква основной колонки, буква резервной колонки, имя столбца основного,имя столца резервного, имя функции поиска цены, буква столбца записи, имя столбца записи)
-                        read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",citilink,lname,"i","Ситилинк")
-                        list_all_search.remove(lname)
-                        write_file_index_kp(list_all_search)
+                        read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",citilink,lname,"i","Ситилинк")                        
                   if ch_regard == "regard":
                         read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",regard,lname,"j","Регард")
-                        list_all_search.remove(lname)
-                        write_file_index_kp(list_all_search)
                   if ch_dns == "dns":
-                        read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",dnsshop,lname,"k","ДНС")
-                        list_all_search.remove(lname)
-                        write_file_index_kp(list_all_search)
-      
+                        read2_xlsx(file_put,lname,"Реестр","h","e","Примечание","Наименование необходимых позиций",dnsshop,lname,"k","ДНС")                        
+                  list_all_search.remove(lname)
+                  write_file_index_kp(list_all_search)      
 
 #поиск по одному
 @eel.expose
