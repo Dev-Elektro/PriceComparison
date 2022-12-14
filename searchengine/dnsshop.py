@@ -32,7 +32,8 @@ class dnsshop(WebSite):
             if content_html.find('div', {'class': 'order-avail-wrap order-avail-wrap_not-avail'}):
                 return []
             product_name = content_html.find('h1', {'class': 'product-card-top__title'}).get_text(strip=True).replace('Характеристики ', '')
-            product_price = content_html.find('div', {'class': 'product-buy__price'}).get_text(strip=True).replace(' ', '')[:-1]
+            product_price = content_html.find('div', {'class': 'product-buy__price'}).get_text(strip=True)
+            product_price = product_price.replace(' ', '').split('₽')[0]
             specifications_html = content_html.find('div', {'class': 'product-card-description'}).find_all('div', {'class': 'product-characteristics__spec'})
             specifications = []
             log.debug(product_name)
